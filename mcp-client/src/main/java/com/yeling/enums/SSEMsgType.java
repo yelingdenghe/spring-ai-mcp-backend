@@ -2,6 +2,7 @@ package com.yeling.enums;
 
 /**
  * @author 夜凌
+ * @Description: 发送SSE的消息类型
  * @ClassName SSEMsgType
  * @Date 2025/10/1 09:58
  * @Version 1.0

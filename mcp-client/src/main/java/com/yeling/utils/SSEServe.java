@@ -63,10 +63,10 @@ public class SSEServe {
             SseEmitter.SseEventBuilder msgEvent = SseEmitter.event()
                     .id(userId)
                     .data(message)
-                    .name(msgType.desc);
+                    .name(msgType.type);
             sseEmitter.send(msgEvent);
         } catch (IOException e) {
-            log.info("SSE error: {}", e.getMessage());
+            log.error("SSE error: {}", e.getMessage());
             remove(userId);
         }
     }
@@ -87,7 +87,7 @@ public class SSEServe {
 
     public static Consumer<Throwable> errorCallBack(String userId) {
         return (throwable) -> {
-            log.info("SSE error callback");
+            log.error("SSE error callback");
             remove(userId);
         };
     }
