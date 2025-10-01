@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: spring-ai-mcp-client
+  profiles:
+    active: dev
+  ai:
+    openai:
+      api-key: sk-e7b387b1243c46adad584ca67dacb39e
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
+          temperature: 0.8
+
+logging:
+  level:
+    root: info
