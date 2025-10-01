@@ -1,8 +1,12 @@
 package com.yeling.utils;
 
+import com.yeling.enums.SSEMsgType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,8 +38,37 @@ public class SSEServe {
         emitter.onCompletion(completionCallback(userId));
         emitter.onError(errorCallBack(userId));
         sseClients.put(userId, emitter);
-        return emitter;
 
+        log.info("Connected to user {}", userId);
+        return emitter;
+    }
+
+    public static void sendMsg(String userId, SSEMsgType msgType, String msg) {
+        if (CollectionUtils.isEmpty(sseClients)) {
+            return;
+        }
+
+        if (sseClients.containsKey(userId)) {
+            SseEmitter emitter = sseClients.get(userId);
+            sendEmitterMessage(emitter, userId, msg, msgType);
+        }
+
+    }
+
+    private static void sendEmitterMessage(SseEmitter sseEmitter,
+                                          String userId,
+                                          String message,
+                                          SSEMsgType msgType) {
+        try {
+            SseEmitter.SseEventBuilder msgEvent = SseEmitter.event()
+                    .id(userId)
+                    .data(message)
+                    .name(msgType.desc);
+            sseEmitter.send(msgEvent);
+        } catch (IOException e) {
+            log.info("SSE error: {}", e.getMessage());
+            remove(userId);
+        }
     }
 
     public static Runnable timeOutCallback(String userId) {
