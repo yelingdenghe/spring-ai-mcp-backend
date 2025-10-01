@@ -46,6 +46,35 @@ class SSEController {
         return "Message sent";
     }
 
+    /**
+     * @description: SSE发送单个消息-add
+     * @author: 夜凌
+     * @date: 2025/10/1 18:52
+     * @param: [userId, message]
+     * @return: Object
+     **/
+    @GetMapping("sendMessageAdd")
+    public Object sendMessageAdd(@RequestParam String userId, @RequestParam String message) throws InterruptedException {
+        for (int i = 0; i<10 ;i++) {
+            Thread.sleep(200);
+            SSEServe.sendMsg(userId, SSEMsgType.ADD, message);
+        }
+        return "Message sent";
+    }
+
+    /**
+     * @description: SSE发送群消息
+     * @author: 夜凌
+     * @date: 2025/10/1 18:33
+     * @param: [message]
+     * @return: Object
+     **/
+    @GetMapping("sendMessageAll")
+    public Object sendMessageAll(@RequestParam String message) {
+        SSEServe.sendMsgToAllUsers(message);
+        return "Message All sent";
+    }
+
 
 
 }

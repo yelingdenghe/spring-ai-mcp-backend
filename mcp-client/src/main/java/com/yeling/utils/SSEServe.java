@@ -52,7 +52,15 @@ public class SSEServe {
             SseEmitter emitter = sseClients.get(userId);
             sendEmitterMessage(emitter, userId, msg, msgType);
         }
+    }
 
+    public static void sendMsgToAllUsers(String msg) {
+        if (CollectionUtils.isEmpty(sseClients)) {
+            return;
+        }
+        sseClients.forEach((userId, emitter) -> {
+            sendEmitterMessage(emitter, userId, msg, SSEMsgType.MESSAGE);
+        });
     }
 
     private static void sendEmitterMessage(SseEmitter sseEmitter,
