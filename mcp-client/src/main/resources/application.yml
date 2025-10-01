@@ -5,11 +5,11 @@ spring:
     active: dev
   ai:
     openai:
-      api-key: sk-e7b387b1243c46adad584ca67dacb39e
-      base-url: https://api.deepseek.com
+      api-key: ${OPENAI_API_KEY}
+      base-url: ${OPENAI_BASE_URL}
       chat:
         options:
-          model: deepseek-chat
+          model: ${OPENAI_MODEL}
           temperature: 0.8
 
 logging:
