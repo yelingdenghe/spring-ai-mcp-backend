@@ -1,5 +1,6 @@
 package com.yeling.service;
 
+import com.yeling.entity.ChatEntity;
 import org.springframework.ai.chat.model.ChatResponse;
 import reactor.core.publisher.Flux;
 
@@ -28,4 +29,13 @@ public interface ChatService {
      * @return: reactor.core.publisher.Flux<org.springframework.ai.chat.model.ChatResponse>
      **/
     Flux<String> steamString(String prompt);
+
+    /**
+     * @description: 和大模型交互
+     * @author: 夜凌
+     * @date: 2025/10/1 19:47
+     * @param: [chat]
+     * @return: void
+     **/
+    void doChat(ChatEntity chat);
 }
