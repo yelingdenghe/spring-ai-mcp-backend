@@ -1,6 +1,8 @@
 package com.yeling.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.yeling.entity.ChatEntity;
+import com.yeling.entity.ChatResponseEntity;
 import com.yeling.enums.SSEMsgType;
 import com.yeling.service.ChatService;
 import com.yeling.utils.SSEServe;
@@ -66,5 +68,13 @@ public class ChatServiceImpl implements ChatService {
             log.info("content: {}", string);
             return string;
         }).toList();
+
+        String collect = String.join("", list);
+
+        ChatResponseEntity chatResponseEntity = new ChatResponseEntity(collect, botMsgId);
+
+        SSEServe.sendMsg(userName, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
+
+
     }
 }
