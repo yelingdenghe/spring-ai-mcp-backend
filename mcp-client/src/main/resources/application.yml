@@ -4,6 +4,11 @@ spring:
   profiles:
     active: dev
   ai:
+    vectorstore:
+      redis:
+        initialize-schema: true
+        index-name: my-vector-index
+        prefix: 'embedding:'
     openai:
       api-key: ${OPENAI_API_KEY}
       base-url: ${OPENAI_BASE_URL}
@@ -11,6 +16,12 @@ spring:
         options:
           model: ${OPENAI_MODEL}
           temperature: 0.8
+  data:
+    redis:
+      host: redis-17826.c299.asia-northeast1-1.gce.redns.redis-cloud.com
+      port: ${REDIS_PORT}
+      username: default
+      password: ${REDIS_PASSWORD}
 
 logging:
   level:
