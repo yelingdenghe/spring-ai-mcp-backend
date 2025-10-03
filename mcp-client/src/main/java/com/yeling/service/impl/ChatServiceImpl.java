@@ -9,6 +9,8 @@ import com.yeling.utils.SSEServe;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -62,11 +64,9 @@ public class ChatServiceImpl implements ChatService {
 
         Flux<String> content = chatClient.prompt().user(prompt).stream().content();
 
-        List<String> list = content.toStream().map(chatResponse -> {
-            String string = chatResponse.toString();
-            SSEServe.sendMsg(userName, SSEMsgType.ADD, string);
-            log.info("content: {}", string);
-            return string;
+        List<String> list = content.toStream().peek(chatResponse -> {
+            SSEServe.sendMsg(userName, SSEMsgType.ADD, chatResponse);
+            log.info("content: {}", chatResponse);
         }).toList();
 
         String collect = String.join("", list);
@@ -74,6 +74,55 @@ public class ChatServiceImpl implements ChatService {
         ChatResponseEntity chatResponseEntity = new ChatResponseEntity(collect, botMsgId);
 
         SSEServe.sendMsg(userName, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
+    }
+
+    private static final String ragPROMPT = """
+                基于上下文的知识库内容回答问题：
+                【上下文】
+                {context}
+            
+                【问题】
+                {question}
+            
+                【输出】
+                如果没有查到，请回复：不知道。
+                如果查到，请回复具体的内容，不想关的近似内容不用提到.
+            """;
+
+
+    @Override
+    public void doChatRagSearch(ChatEntity chat, List<Document> ragContext) {
+        String userName = chat.getCurrentUserName();
+        String question = chat.getMessage();
+        String botMsgId = chat.getBotMsgId();
+
+        // 构建提示词
+        String context = null;
+        if (ragContext!=null && !ragContext.isEmpty()) {
+            context = ragContext.stream()
+                    .map(Document::getText)
+                    .collect(Collectors.joining("\n"));
+        }
+
+        // 组装提示词
+        Prompt prompt = new Prompt(ragPROMPT
+                .replace("{context}", context)
+                .replace("{question}", question));
+        System.out.println(prompt);
+
+        Flux<String> content = chatClient.prompt(prompt).stream().content();
+
+        List<String> list = content.toStream().peek(chatResponse -> {
+            SSEServe.sendMsg(userName, SSEMsgType.ADD, chatResponse);
+            log.info("content: {}", chatResponse);
+        }).toList();
+
+        String collect = String.join("", list);
+
+        ChatResponseEntity chatResponseEntity = new ChatResponseEntity(collect, botMsgId);
+
+        SSEServe.sendMsg(userName, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
+
 
 
     }

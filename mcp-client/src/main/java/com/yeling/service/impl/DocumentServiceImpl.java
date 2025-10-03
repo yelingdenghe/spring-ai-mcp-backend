@@ -49,11 +49,12 @@ public class DocumentServiceImpl implements DocumentService {
         // 将文档添加到redis中--向量存储
         redisVectorStore.add(list);
 
-        // 检索与查询相似的文档
-        List<Document> spring = this.redisVectorStore.similaritySearch(SearchRequest.builder()
-                        .query("Spring")
-                        .topK(5)
-                        .build());
 
+    }
+
+    @Override
+    public List<Document> doSearch(String question) {
+        // 检索与查询相似的文档
+        return this.redisVectorStore.similaritySearch(question);
     }
 }

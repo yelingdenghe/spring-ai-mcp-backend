@@ -1,7 +1,10 @@
 package com.yeling.service;
 
+import org.springframework.ai.document.Document;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author 夜凌
@@ -20,5 +23,14 @@ public interface DocumentService {
      * @return: void
      **/
     void uploadText(Resource resource, String fileName);
+
+    /**
+     * @description: 根据提问从知识库中进行查询
+     * @author: 夜凌
+     * @date: 2025/10/3 15:40
+     * @param: [question]
+     * @return: void
+     **/
+    List<Document> doSearch(String question);
 
 }

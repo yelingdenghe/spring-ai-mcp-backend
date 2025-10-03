@@ -2,7 +2,10 @@ package com.yeling.service;
 
 import com.yeling.entity.ChatEntity;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.document.Document;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 /**
  * @author 夜凌
@@ -38,4 +41,13 @@ public interface ChatService {
      * @return: void
      **/
     void doChat(ChatEntity chat);
+
+    /**
+     * @description: Rag知识库检索汇总到大模型输出
+     * @author: 夜凌
+     * @date: 2025/10/3 15:58
+     * @param: [chat, ragContext]
+     * @return: void
+     **/
+    void doChatRagSearch(ChatEntity chat, List<Document> ragContext);
 }

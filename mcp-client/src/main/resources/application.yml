@@ -16,6 +16,9 @@ spring:
         options:
           model: ${OPENAI_MODEL}
           temperature: 0.8
+      embedding:
+        options:
+          model: ${OPENAI_MODEL}
   data:
     redis:
       host: redis-17826.c299.asia-northeast1-1.gce.redns.redis-cloud.com
