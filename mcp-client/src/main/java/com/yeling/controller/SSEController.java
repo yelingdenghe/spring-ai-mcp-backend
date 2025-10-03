@@ -37,7 +37,7 @@ class SSEController {
      * @description: SSE发送单个消息
      * @author: 夜凌
      * @date: 2025/10/1 10:21
-     * @param: [userId, message]
+     * @param: [userId, msg]
      * @return: Object
      **/
     @GetMapping("sendMessage")
@@ -50,7 +50,7 @@ class SSEController {
      * @description: SSE发送单个消息-add
      * @author: 夜凌
      * @date: 2025/10/1 18:52
-     * @param: [userId, message]
+     * @param: [userId, msg]
      * @return: Object
      **/
     @GetMapping("sendMessageAdd")
@@ -66,7 +66,7 @@ class SSEController {
      * @description: SSE发送群消息
      * @author: 夜凌
      * @date: 2025/10/1 18:33
-     * @param: [message]
+     * @param: [msg]
      * @return: Object
      **/
     @GetMapping("sendMessageAll")

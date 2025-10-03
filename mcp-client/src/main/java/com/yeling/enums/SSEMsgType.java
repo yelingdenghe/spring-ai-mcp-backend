@@ -9,7 +9,7 @@ package com.yeling.enums;
  */
 public enum SSEMsgType {
 
-    MESSAGE("message", "单词发送的普通类型消息"),
+    MESSAGE("msg", "单词发送的普通类型消息"),
     ADD("add", "消息追加，适用于流式的消息推送"),
     FINISH("finish", "消息完成"),
     CUSTOM_EVENT("custom_event", "单词发送的普通类型消息"),
