@@ -20,14 +20,14 @@ spring:
     embedding:
       transformer:
         tokenizer:
-          uri: file:\F:\AI\Model\onnx-output-folder\Qwen3-Embedding-0.6B\tokenizer.json
+          uri: ${EMBEDDING_TOKENIZER_URL}
         onnx:
-          model-uri: file:\F:\AI\Model\onnx-output-folder\Qwen3-Embedding-0.6B\model.onnx
+          model-uri: ${EMBEDDING_ONNX_MODEL_URL}
           model-output-name: token_embeddings
 
   data:
     redis:
-      host: redis-17826.c299.asia-northeast1-1.gce.redns.redis-cloud.com
+      host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       username: default
       password: ${REDIS_PASSWORD}
