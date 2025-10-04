@@ -11,7 +11,7 @@ target/
 *.iws
 *.iml
 *.ipr
-
+model.onnx_data
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -36,3 +36,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/model.onnx_data
+/model.onnx_data

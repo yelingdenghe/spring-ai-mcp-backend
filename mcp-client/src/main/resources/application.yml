@@ -15,10 +15,16 @@ spring:
       chat:
         options:
           model: ${OPENAI_MODEL}
-          temperature: 0.8
-      embedding:
-        options:
-          model: ${OPENAI_MODEL}
+    model:
+      embedding: transformers
+    embedding:
+      transformer:
+        tokenizer:
+          uri: file:\F:\AI\Model\onnx-output-folder\Qwen3-Embedding-0.6B\tokenizer.json
+        onnx:
+          model-uri: file:\F:\AI\Model\onnx-output-folder\Qwen3-Embedding-0.6B\model.onnx
+          model-output-name: token_embeddings
+
   data:
     redis:
       host: redis-17826.c299.asia-northeast1-1.gce.redns.redis-cloud.com
