@@ -5,8 +5,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -48,7 +46,6 @@ public class OkHttpClientUtil {
         Request request = new Request.Builder()
                 .url(build)
                 .build();
-
 
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);

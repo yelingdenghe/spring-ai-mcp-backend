@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ class SearXngServiceImpl implements SearXngService {
     private String SEARXNG_URL;
 
     @Value("${internet.websearch.searxng.counts}")
-    private Integer counts;
+    private Integer COUNTS;
 
     @Override
     public List<SearchResult> search(String query) {
@@ -38,6 +39,22 @@ class SearXngServiceImpl implements SearXngService {
             return Collections.emptyList();
         }
 
-        return results;
+        return dealResults(results);
+    }
+
+    /**
+     * @description: 处理结果集，截取限制数的长度
+     * @author: 夜凌
+     * @date: 2025/10/5 18:01
+     * @param: [results]
+     * @return: List<SearchResult>
+     **/
+    private List<SearchResult> dealResults(List<SearchResult> results) {
+
+        return results.subList(0, Math.min(COUNTS, results.size()))
+                .parallelStream()
+                .sorted((Comparator.comparingDouble(SearchResult::getScore).reversed()))
+                .limit(COUNTS)
+                .toList();
     }
 }
