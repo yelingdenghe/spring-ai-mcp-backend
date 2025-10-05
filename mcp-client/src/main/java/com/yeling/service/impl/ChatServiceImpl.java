@@ -90,6 +90,7 @@ public class ChatServiceImpl implements ChatService {
             """;
 
 
+    /** {@inheritDoc} */
     @Override
     public void doChatRagSearch(ChatEntity chat, List<Document> ragContext) {
         String userName = chat.getCurrentUserName();
@@ -122,8 +123,6 @@ public class ChatServiceImpl implements ChatService {
         ChatResponseEntity chatResponseEntity = new ChatResponseEntity(collect, botMsgId);
 
         SSEServe.sendMsg(userName, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
-
-
-
+        
     }
 }

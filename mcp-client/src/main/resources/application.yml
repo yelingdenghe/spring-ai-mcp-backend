@@ -35,3 +35,14 @@ spring:
 logging:
   level:
     root: info
+
+internet:
+  websearch:
+    searxng:
+      url: http://localhost:6080/search
+      counts: 25
+
+ok:
+  http:
+    read-timeout: 30
+    write-timeout: 30
