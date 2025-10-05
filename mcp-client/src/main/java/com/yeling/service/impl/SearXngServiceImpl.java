@@ -1,5 +1,7 @@
 package com.yeling.service.impl;
 
+import cn.hutool.json.JSONUtil;
+import com.yeling.entity.SearXngResponse;
 import com.yeling.entity.SearchResult;
 import com.yeling.service.SearXngService;
 import com.yeling.utils.OkHttpClientUtil;
@@ -8,6 +10,7 @@ import okhttp3.HttpUrl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,8 +32,12 @@ class SearXngServiceImpl implements SearXngService {
 
     @Override
     public List<SearchResult> search(String query) {
-        HttpUrl httpUrl = OkHttpClientUtil.doGet(SEARXNG_URL, query);
-        log.info("Searching for: " + httpUrl.url());
-        return List.of();
+        List<SearchResult> results = OkHttpClientUtil.doGet(SEARXNG_URL, query, SearXngResponse.class).getResults();
+
+        if (results == null || results.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return results;
     }
 }
