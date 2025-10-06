@@ -4,6 +4,16 @@ spring:
   profiles:
     active: dev
   ai:
+    mcp:
+      client:
+        type: async
+        sse:
+          connections:
+            server1:
+              url: https://mcp.amap.com
+              sse-endpoint: /sse?key=6876bf94ee5bf85d2d6de47d00532c58
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
     vectorstore:
       redis:
         initialize-schema: true
