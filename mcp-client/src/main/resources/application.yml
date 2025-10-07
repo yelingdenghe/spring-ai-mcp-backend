@@ -12,6 +12,9 @@ spring:
             server1:
               url: https://mcp.amap.com
               sse-endpoint: /sse?key=6876bf94ee5bf85d2d6de47d00532c58
+            server2:
+              url: http://localhost:9060
+              sse-endpoint: /sse
         stdio:
           servers-configuration: classpath:mcp-servers.json
     vectorstore:

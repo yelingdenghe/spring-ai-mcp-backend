@@ -1,6 +1,8 @@
 package com.yeling.service;
 
 import com.yeling.entity.ChatEntity;
+import jakarta.annotation.Resource;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
 import reactor.core.publisher.Flux;

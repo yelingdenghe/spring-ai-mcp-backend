@@ -7,6 +7,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>mcp-client</module>
+        <module>mcp-server</module>
     </modules>
 
     <groupId>com.yeling</groupId>
