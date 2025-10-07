@@ -1,14 +1,11 @@
 package com.yeling.mcp.config;
 
-import com.yeling.mcp.tool.DateToolEntity;
+import com.yeling.mcp.tool.DateTool;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Description;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.function.Function;
 
 /**
  * @author 夜凌
@@ -22,16 +19,7 @@ import java.util.function.Function;
 public class ToolConfiguration {
 
     @Bean
-    @Description("获取当前的日期和时间")
-    public Function<DateToolEntity.Request, DateToolEntity.Response> currentTimeFunction() {
-        return (request -> {
-            log.info("======调用函数式工具：currentTimeFunction()======");
-
-            String format = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-            String currentTime = String.format("当前时间是 %s", format);
-
-            return new DateToolEntity.Response(currentTime);
-        });
+    public ToolCallbackProvider DateTools(DateTool dateToolEntity) {
+        return MethodToolCallbackProvider.builder().toolObjects(dateToolEntity).build();
     }
 }
