@@ -1,11 +1,13 @@
 package com.yeling.mcp.config;
 
 import com.yeling.mcp.tool.DateTool;
+import com.yeling.mcp.tool.EmailTool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.MailSender;
 
 /**
  * @author 夜凌
@@ -19,7 +21,10 @@ import org.springframework.context.annotation.Configuration;
 public class ToolConfiguration {
 
     @Bean
-    public ToolCallbackProvider DateTools(DateTool dateToolEntity) {
-        return MethodToolCallbackProvider.builder().toolObjects(dateToolEntity).build();
+    public ToolCallbackProvider DateTools(DateTool dateToolEntity, EmailTool emailTool) {
+        return MethodToolCallbackProvider
+                .builder()
+                .toolObjects(dateToolEntity, emailTool)
+                .build();
     }
 }
