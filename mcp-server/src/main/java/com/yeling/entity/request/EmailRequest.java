@@ -1,4 +1,4 @@
-package com.yeling.entity;
+package com.yeling.entity.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
