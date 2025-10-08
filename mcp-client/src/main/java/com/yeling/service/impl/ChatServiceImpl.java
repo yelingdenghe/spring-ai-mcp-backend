@@ -33,18 +33,28 @@ public class ChatServiceImpl implements ChatService {
     @Resource
     private SearXngService searXngService;
 
-    private final ChatClient chatClient;
+    @Resource(name = "deepseekClient")
+    private ChatClient deepseekClient;
 
-    public ChatServiceImpl(ChatClient chatClient) {
-        // 使用 Builder 来创建一个 ChatClient 实例
-        this.chatClient = chatClient;
+    @Resource(name = "qwenClient")
+    private ChatClient qwenClient;
+
+    /** 获取对应模型的 ChatClient */
+    private ChatClient getClient(String modelName) {
+        if (modelName == null || modelName.isBlank()) {
+            return deepseekClient; // 默认 deepseek
+        }
+        return switch (modelName.toLowerCase()) {
+            case "qwen" -> qwenClient;
+            default -> deepseekClient;
+        };
     }
 
     /** {@inheritDoc} */
     @Override
     public String chatTest(String prompt) {
         // 使用 ChatClient 的链式 API 进行调用，代码更简洁
-        return chatClient.prompt()
+        return deepseekClient.prompt()
                 .user(prompt) // 设置用户输入
                 .call()       // 发起调用
                 .content();   // 直接获取返回的文本内容
@@ -53,7 +63,7 @@ public class ChatServiceImpl implements ChatService {
     /** {@inheritDoc} */
     @Override
     public Flux<String> steamString(String prompt) {
-        return chatClient.prompt()
+        return deepseekClient.prompt()
                 .user(u -> u
                     .text(prompt))
                 .stream()
@@ -63,6 +73,8 @@ public class ChatServiceImpl implements ChatService {
     /** {@inheritDoc} */
     @Override
     public void doChat(ChatEntity chat) {
+        ChatClient chatClient = getClient(chat.getModelName());
+
         String userName = chat.getCurrentUserName();
         String prompt = chat.getMessage();
         String botMsgId = chat.getBotMsgId();
@@ -98,6 +110,8 @@ public class ChatServiceImpl implements ChatService {
     /** {@inheritDoc} */
     @Override
     public void doChatRagSearch(ChatEntity chat, List<Document> ragContext) {
+        ChatClient chatClient = getClient(chat.getModelName());
+
         String userName = chat.getCurrentUserName();
         String question = chat.getMessage();
         String botMsgId = chat.getBotMsgId();
@@ -147,6 +161,7 @@ public class ChatServiceImpl implements ChatService {
     /** {@inheritDoc} */
     @Override
     public void doInternetSearch(ChatEntity chat) {
+        ChatClient chatClient = getClient(chat.getModelName());
 
         String userName = chat.getCurrentUserName();
         String question = chat.getMessage();

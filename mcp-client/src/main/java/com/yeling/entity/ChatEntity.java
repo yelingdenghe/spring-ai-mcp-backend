@@ -22,4 +22,6 @@ public class ChatEntity {
     private String message;
     private String botMsgId;
 
+    private String modelName; // 新增字段，可选（deepseek / qwen）
+
 }

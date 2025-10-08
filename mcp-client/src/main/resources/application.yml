@@ -28,6 +28,12 @@ spring:
       chat:
         options:
           model: ${OPENAI_MODEL}
+    qwen:
+      api-key: ${QWEN_API_KEY}
+      base-url: ${QWEN_BASE_URL}
+      chat:
+        options:
+            model: ${QWEN_MODEL}
     model:
       embedding: transformers
     embedding:
