@@ -36,9 +36,11 @@ public class EmailTool {
     }
 
     @Tool(description = "给指定邮箱发送邮件，email 为收件人， subject 为邮件标题， message 为邮件内容")
-    public void sendMailMessage(@ToolParam(description = "映射了上面所需的三个参数") EmailRequest email) {
+    public void sendMailMessage(EmailRequest email) {
         log.info("====== 调用MCP工具：sendMailMessage() ======");
         log.info("====== 参数 email：{} ======", email);
+
+        Integer contentType = email.getContentType();
 
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -47,7 +49,13 @@ public class EmailTool {
             helper.setFrom(from);
             helper.setTo(email.getEmail());
             helper.setSubject(email.getSubject());
-            helper.setText(covert(email.getMessage()), true);
+            if (contentType == 1) {
+                helper.setText(covert(email.getMessage()), true);
+            } else if (contentType == 2) {
+                helper.setText(email.getMessage(), true);
+            } else {
+                helper.setText(email.getMessage());
+            }
 
             mailSender.send(mimeMessage);
         } catch (Exception e) {

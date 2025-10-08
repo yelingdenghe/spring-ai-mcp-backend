@@ -22,4 +22,6 @@ public class EmailRequest {
     String subject;
     @ToolParam(description = "发送邮件的正文内容/消息")
     String message;
+    @ToolParam(description = "邮件的内容是否为html还是如果是markdown格式为格式。如果是markdown格式，则为1，如果是html格式，则为2，其他格式为0")
+    private Integer contentType;
 }
