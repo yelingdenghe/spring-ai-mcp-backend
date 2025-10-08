@@ -1,6 +1,7 @@
 package com.yeling.mcp.tool;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yeling.entity.Product;
 import com.yeling.entity.request.CreatProductRequest;
 import com.yeling.entity.request.DeleteProductRequest;
+import com.yeling.entity.request.ModifyProductRequest;
 import com.yeling.entity.request.QueryProductRequest;
 import com.yeling.mapper.ProductMapper;
 import jakarta.annotation.Resource;
@@ -120,7 +122,7 @@ public class ProductTool {
         queryWrapper.le(request.getMaxPrice() != null, "price", request.getMaxPrice());
         queryWrapper.eq(request.getStatus() != null, "status", request.getStatus());
 
-        // 3. 构建动态排序条件 (这部分逻辑不变，但位置更合理了)
+        // 3. 构建动态排序条件
         if (StringUtils.hasText(request.getSortBy())) {
             String dbColumn = null;
             // 将前端友好的排序字段名映射到数据库列名，防止SQL注入风险
@@ -132,7 +134,7 @@ public class ProductTool {
 
             if (dbColumn != null) {
                 // 如果sortEnum为空，String.valueOf会返回"null"，equalsIgnoreCase("DESC")为false，isAsc为true，默认升序。
-                boolean isAsc = !"DESC".equalsIgnoreCase(String.valueOf(request.getSortEnum()));
+                boolean isAsc = !"DESC".equalsIgnoreCase(String.valueOf(request.getSortOrder()));
                 queryWrapper.orderBy(true, isAsc, dbColumn);
             }
         }
@@ -152,6 +154,80 @@ public class ProductTool {
         } catch (JsonProcessingException e) {
             log.error("商品列表JSON序列化失败", e);
             return "查询成功，但结果格式化失败。";
+        }
+    }
+
+    @Transactional
+    @Tool(description = "根据商品编号/商品名称+商品品牌来修改商品信息。")
+    public String modifyProduct(ModifyProductRequest request) {
+        log.info("====== 调用MCP工具：modifyProduct() ======");
+        log.info("====== 修改商品参数：{} ======", request);
+
+        // 1. 验证定位条件是否充足
+        boolean hasId = StringUtils.hasText(request.getFindProductId());
+        boolean hasNameAndBrand = StringUtils.hasText(request.getFindProductName()) && StringUtils.hasText(request.getFindBrand());
+        if (!hasId && !hasNameAndBrand) {
+            return "操作失败：必须提供商品编号，或同时提供商品名称和品牌来定位要修改的商品。";
+        }
+
+        // 2. 验证是否提供了任何要修改的数据
+        if (request.getProductName() == null && request.getBrand() == null && request.getPrice() == null &&
+                request.getStock() == null && request.getDescription() == null && request.getStatus() == null) {
+            return "操作失败：没有提供任何需要修改的商品信息。";
+        }
+
+        // 3. 构建查询/定位条件 (WHERE子句)
+        QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
+        String findConditionDesc;
+
+        if (hasId) {
+            queryWrapper.eq("product_id", request.getFindProductId());
+            findConditionDesc = "编号为 '" + request.getFindProductId() + "'";
+        } else {
+            queryWrapper
+                    .eq("product_name", request.getFindProductName())
+                    .eq("brand", request.getFindBrand());
+            findConditionDesc = "名称为 '" + request.getFindProductName() + "'，且品牌为 '" + request.getFindBrand() + "'";
+        }
+
+        // 安全检查：在更新前，先确认商品是否存在且唯一
+        List<Product> productsToUpdate = productMapper.selectList(queryWrapper);
+        if (productsToUpdate.isEmpty()) {
+            return "操作失败：未找到符合条件 [" + findConditionDesc + "] 的商品。";
+        }
+        if (productsToUpdate.size() > 1) {
+            return "操作失败：找到多个符合条件的商品，请使用唯一的商品编号进行修改以避免歧义。";
+        }
+
+        // 4. 构建更新数据 (SET子句)
+        UpdateWrapper<Product> updateWrapper = new UpdateWrapper<>();
+        // 动态设置要更新的字段，只有非null的字段才会被更新
+        updateWrapper.set(request.getProductName() != null, "product_name", request.getProductName());
+        updateWrapper.set(request.getBrand() != null, "brand", request.getBrand());
+        updateWrapper.set(request.getPrice() != null, "price", request.getPrice());
+        updateWrapper.set(request.getStock() != null, "stock", request.getStock());
+        updateWrapper.set(request.getDescription() != null, "description", request.getDescription());
+        updateWrapper.set(request.getStatus() != null, "status", request.getStatus());
+        updateWrapper.set("update_time", LocalDateTime.now()); // 自动更新修改时间
+
+        // 直接在 UpdateWrapper 上构建 WHERE 条件
+        if (hasId) {
+            updateWrapper.eq("product_id", request.getFindProductId());
+        } else {
+            updateWrapper.eq("product_name", request.getFindProductName())
+                    .eq("brand", request.getFindBrand());
+        }
+
+        // 5. 执行更新
+        int updatedRows = productMapper.update(null, updateWrapper);
+
+        // 6. 返回准确的结果
+        if (updatedRows > 0) {
+            String successMsg = "操作成功：已更新 " + updatedRows + " 个商品的信息。";
+            log.info(successMsg);
+            return successMsg;
+        } else {
+            return "操作失败：更新未生效，请检查商品状态或联系管理员。";
         }
     }
 }

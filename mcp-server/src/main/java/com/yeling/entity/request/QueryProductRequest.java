@@ -43,7 +43,7 @@ public class QueryProductRequest {
     private String sortBy;
 
     @ToolParam(description = "排序顺序 (可选值: 'ASC' for 升序, 'DESC' for 降序)", required = false)
-    private ListSortEnum sortEnum;
+    private ListSortEnum sortOrder;
 
     // --- 分页参数 ---
     @ToolParam(description = "页码，从1开始", required = false)
