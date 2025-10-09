@@ -90,27 +90,4 @@ public class MultiModelConfig {
                 .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（Qwen）")
                 .build();
     }
-
-    /** Qwen 图像模型 */
-    @Bean("qwenImageClient")
-    public OpenAiImageModel qwenImageClient() {
-        OpenAiImageApi api = OpenAiImageApi.builder()
-                .baseUrl(qwenUrl)
-                .apiKey(qwenKey)
-                .build();
-
-        OpenAiImageOptions imageOptions = OpenAiImageOptions.builder()
-                .model("MusePublic/489_ckpt_FLUX_1")
-                .N(1)
-                .responseFormat("b64_json")
-                .build();
-
-        return new OpenAiImageModel(
-                api,
-                imageOptions,
-                RetryUtils.DEFAULT_RETRY_TEMPLATE,
-                ObservationRegistry.NOOP
-        );
-    }
-
 }

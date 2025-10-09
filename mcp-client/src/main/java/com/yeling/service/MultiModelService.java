@@ -12,5 +12,4 @@ import org.springframework.ai.openai.OpenAiImageModel;
  */
 public interface MultiModelService {
     ChatClient getChatClient(String modelName);
-    OpenAiImageModel getImageClient(String modelName);
 }
