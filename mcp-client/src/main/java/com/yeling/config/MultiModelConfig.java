@@ -1,12 +1,14 @@
 package com.yeling.config;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +45,7 @@ public class MultiModelConfig {
     private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
 
     /**
-     * 默认 DeepSeek
+     * 默认 DeepSeek - 对话模型
      */
     @Bean("deepseekClient")
     public ChatClient deepseekClient(ToolCallbackProvider tools) {
@@ -66,7 +68,7 @@ public class MultiModelConfig {
     }
 
     /**
-     * Qwen 模型
+     * Qwen 模型 - 对话模型
      */
     @Bean("qwenClient")
     public ChatClient qwenClient(ToolCallbackProvider tools) {
@@ -88,4 +90,27 @@ public class MultiModelConfig {
                 .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（Qwen）")
                 .build();
     }
+
+    /** Qwen 图像模型 */
+    @Bean("qwenImageClient")
+    public OpenAiImageModel qwenImageClient() {
+        OpenAiImageApi api = OpenAiImageApi.builder()
+                .baseUrl(qwenUrl)
+                .apiKey(qwenKey)
+                .build();
+
+        OpenAiImageOptions imageOptions = OpenAiImageOptions.builder()
+                .model("MusePublic/489_ckpt_FLUX_1")
+                .N(1)
+                .responseFormat("b64_json")
+                .build();
+
+        return new OpenAiImageModel(
+                api,
+                imageOptions,
+                RetryUtils.DEFAULT_RETRY_TEMPLATE,
+                ObservationRegistry.NOOP
+        );
+    }
+
 }

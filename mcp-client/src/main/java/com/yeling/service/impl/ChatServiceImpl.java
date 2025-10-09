@@ -6,6 +6,7 @@ import com.yeling.entity.ChatResponseEntity;
 import com.yeling.entity.SearchResult;
 import com.yeling.enums.SSEMsgType;
 import com.yeling.service.ChatService;
+import com.yeling.service.MultiModelService;
 import com.yeling.service.SearXngService;
 import com.yeling.utils.SSEServe;
 import jakarta.annotation.Resource;
@@ -33,21 +34,15 @@ public class ChatServiceImpl implements ChatService {
     @Resource
     private SearXngService searXngService;
 
+    @Resource
+    private MultiModelService multiModelService;
+
     @Resource(name = "deepseekClient")
     private ChatClient deepseekClient;
 
-    @Resource(name = "qwenClient")
-    private ChatClient qwenClient;
-
     /** 获取对应模型的 ChatClient */
     private ChatClient getClient(String modelName) {
-        if (modelName == null || modelName.isBlank()) {
-            return deepseekClient; // 默认 deepseek
-        }
-        return switch (modelName.toLowerCase()) {
-            case "qwen" -> qwenClient;
-            default -> deepseekClient;
-        };
+        return multiModelService.getChatClient(modelName);
     }
 
     /** {@inheritDoc} */
