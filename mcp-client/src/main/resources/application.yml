@@ -34,6 +34,8 @@ spring:
       chat:
         options:
             model: ${QWEN_MODEL}
+      audio:
+        api-key: ${QWEN_AUDIO_API_KEY}
     model:
       embedding: transformers
     embedding:
@@ -43,6 +45,10 @@ spring:
         onnx:
           model-uri: ${EMBEDDING_ONNX_MODEL_URL}
           model-output-name: token_embeddings
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   data:
     redis:
