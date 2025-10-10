@@ -10,6 +10,9 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
+import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +44,15 @@ public class MultiModelConfig {
 
     @Value("${spring.ai.qwen.chat.options.model}")
     private String qwenModel;
+
+    @Value("${spring.ai.zhipuai.api-key}")
+    private String zhipuKey;
+
+    @Value("${spring.ai.zhipuai.base-url}")
+    private String zhipuUrl;
+
+     @Value("${spring.ai.zhipuai.chat.options.model}")
+     private String zhipuModel;
 
     private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
 
@@ -90,4 +102,26 @@ public class MultiModelConfig {
                 .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（Qwen）")
                 .build();
     }
+
+    /**
+     * ZhiPu 模型 - 图生文模型
+     */
+    @Bean("zhipuClient")
+    public ChatClient zhipuClient(ToolCallbackProvider tools) {
+        ZhiPuAiApi api = new ZhiPuAiApi(zhipuKey);
+
+        ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
+                .model(zhipuModel)
+                .temperature(0.7)
+                .build();
+
+        ZhiPuAiChatModel model = new ZhiPuAiChatModel(api, options);
+
+        return ChatClient.builder(model)
+                .defaultToolCallbacks(tools)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（ZhiPuAi）")
+                .build();
+    }
+
 }

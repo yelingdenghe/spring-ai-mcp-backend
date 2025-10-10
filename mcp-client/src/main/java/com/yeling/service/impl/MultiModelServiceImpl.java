@@ -26,6 +26,10 @@ public class MultiModelServiceImpl implements MultiModelService {
     @Qualifier("qwenClient")
     private ChatClient qwenClient;
 
+    @Resource
+    @Qualifier("zhipuClient")
+    private ChatClient zhipuClient;
+
     @Override
     public ChatClient getChatClient(String modelName) {
         if (modelName == null || modelName.isBlank()) {
@@ -33,6 +37,7 @@ public class MultiModelServiceImpl implements MultiModelService {
         }
         return switch (modelName.toLowerCase()) {
             case "qwen" -> qwenClient;
+            case "zhipu" -> zhipuClient;
             default -> deepseekClient;
         };
     }

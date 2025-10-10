@@ -1,14 +1,27 @@
 package com.yeling.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yeling.entity.ChatResponseEntity;
+import com.yeling.enums.SSEMsgType;
 import com.yeling.service.AsyncImageService;
+import com.yeling.service.MultiModelService;
+import com.yeling.utils.SSEServe;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +35,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class AsyncImageServiceImpl implements AsyncImageService {
+    @Resource
+    private MultiModelService multiModelService;
+
     private static final String BASE_URL = "https://api-inference.modelscope.cn/";
     private static final String API_KEY = "ms-0b08dbea-3886-4a48-99a0-c9d652c2d14f";
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -104,5 +120,46 @@ public class AsyncImageServiceImpl implements AsyncImageService {
             log.error("图像生成异常：", e);
             return new byte[0];
         }
+    }
+
+    @Override
+    public void doImage(String query, MultipartFile file, String userId, String botMsgId) throws IOException {
+
+        ChatClient chatClient = multiModelService.getChatClient("zhipu");
+
+        // 从 MultipartFile 中获取字节数组
+        byte[] imageBytes = file.getBytes();
+        // 使用字节数组创建一个 ByteArrayResource 实例
+        // 它是一个 Resource，可以被 .media() 方法接受
+        ByteArrayResource imageResource = new ByteArrayResource(imageBytes) {
+            // 重写 getFilename 方法可以提供原始文件名，这对于某些处理流程可能是必要的
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
+            }
+        };
+
+        // 获取流
+        Flux<String> contentStream = chatClient.prompt()
+                .user(u -> u
+                        .text(query)
+                        .media(MimeTypeUtils.parseMimeType(file.getContentType()), imageResource)
+                )
+                .stream()
+                .content();
+        // 订阅流并使用 SSEServe 推送数据
+        List<String> list = contentStream.toStream().peek(chunk -> {
+            SSEServe.sendMsg(userId, SSEMsgType.ADD, chunk);
+            log.info("ImageDesc content: {}", chunk);
+        }).toList();
+
+        // 拼接完整消息
+        String finalContent = String.join("", list);
+
+        // 创建最终的响应实体
+        ChatResponseEntity chatResponseEntity = new ChatResponseEntity(finalContent, botMsgId);
+
+        // 发送结束信号
+        SSEServe.sendMsg(userId, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
     }
 }

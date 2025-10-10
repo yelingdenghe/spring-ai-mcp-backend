@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -19,4 +22,6 @@ import java.util.concurrent.TimeUnit;
 public interface AsyncImageService {
 
     byte[] generateImage(String prompt, String model);
+
+    void doImage(String query, MultipartFile file, String userId, String botMsgId) throws IOException;
 }

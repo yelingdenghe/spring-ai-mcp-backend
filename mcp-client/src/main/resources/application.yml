@@ -13,7 +13,7 @@ spring:
               url: https://mcp.amap.com
               sse-endpoint: /sse?key=6876bf94ee5bf85d2d6de47d00532c58
             server2:
-              url: http://localhost:9060
+              url: http://localhost:9001
               sse-endpoint: /sse
         stdio:
           servers-configuration: classpath:mcp-servers.json
@@ -28,6 +28,7 @@ spring:
       chat:
         options:
           model: ${OPENAI_MODEL}
+
     qwen:
       api-key: ${QWEN_API_KEY}
       base-url: ${QWEN_BASE_URL}
@@ -36,6 +37,13 @@ spring:
             model: ${QWEN_MODEL}
       audio:
         api-key: ${QWEN_AUDIO_API_KEY}
+    zhipuai:
+      api-key: ${ZHIPU_API_KRY}
+      base-url: ${ZHIPU_BASE_URL}
+      chat:
+        options:
+          model: ${ZHIPU_MODEL}
+
     model:
       embedding: transformers
     embedding:
