@@ -7,15 +7,22 @@ import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
+import com.yeling.entity.FrameRequest;
+import com.yeling.entity.TaskStatusResponse;
 import com.yeling.service.video.FrameService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,19 +39,30 @@ public class FrameServiceImpl implements FrameService {
     @Value("${spring.ai.qwen.video.api-key}")
     private String qwenKey;
 
-    @Value("classpath:images/first.png")
-    private Resource firstFrame;
-    @Value("classpath:images/last.png")
-    private Resource lastFrame;
-
     // 定义轮询间隔时间（毫秒）
     private static final long POLLING_INTERVAL_MS = 5000; // 5秒
 
     // 定义任务超时时间（毫秒）
     private static final long TASK_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(20); // 20分钟
     @Override
-    public String asyncCall() {
+    public String asyncCall(FrameRequest frameRequest) {
+        Path firstFrameTemp = null;
+        Path lastFrameTemp = null;
+        MultipartFile firstFrame = frameRequest.getFirstFrame();
+        MultipartFile lastFrame = frameRequest.getLastFrame();
         try {
+            // 1. 使用统一的前缀 "frame_" 创建临时文件
+            firstFrameTemp = Files.createTempFile("frame_", "_" + firstFrame.getOriginalFilename());
+            Files.copy(firstFrame.getInputStream(), firstFrameTemp, StandardCopyOption.REPLACE_EXISTING);
+
+            lastFrameTemp = Files.createTempFile("frame_", "_" + lastFrame.getOriginalFilename());
+            Files.copy(lastFrame.getInputStream(), lastFrameTemp, StandardCopyOption.REPLACE_EXISTING);
+
+            // 2. 构造符合SDK要求的文件路径格式
+            String firstFrameUrl = "file:///" + firstFrameTemp.toAbsolutePath().toString().replace("\\", "/");
+            String lastFrameUrl = "file:///" + lastFrameTemp.toAbsolutePath().toString().replace("\\", "/");
+
+
             // 创建视频处理参数
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("prompt_extend", true);
@@ -52,62 +70,52 @@ public class FrameServiceImpl implements FrameService {
             // 创建视频合成工具
             VideoSynthesis videoSynthesis = new VideoSynthesis();
 
-            // 创建首尾帧参数
-            String firstFrameUrl = null;
-            String lastFrameUrl = null;
-            firstFrameUrl = "file:///" + firstFrame.getFile().getAbsolutePath().replace("\\", "/");
-            lastFrameUrl = "file:///" + lastFrame.getFile().getAbsolutePath().replace("\\", "/");
-
             // 创建视频合成参数
             VideoSynthesisParam param = VideoSynthesisParam.builder()
                     .apiKey(qwenKey)
-                    .model("wanx2.1-kf2v-plus")
-                    .prompt("写实风格，一只黑色小猫好奇地看向天空，镜头从平视逐渐上升，最后俯拍小猫好奇的眼神。")
+                    .model(frameRequest.getModel())
+                    .prompt(frameRequest.getPrompt())
                     .firstFrameUrl(firstFrameUrl)
                     .lastFrameUrl(lastFrameUrl)
                     .parameters(parameters)
                     .build();
 
-            VideoSynthesisResult result;
-            log.info("异步开始中，请等待几分钟...");
-            result = videoSynthesis.asyncCall(param);
-
+            log.info("提交异步任务...");
+            VideoSynthesisResult result = videoSynthesis.asyncCall(param);
             String taskId = result.getOutput().getTaskId();
-            log.info("任务状态：{}", JsonUtils.toJson(result));
-            log.info("任务ID：{}", taskId);
+            log.info("任务提交成功，任务ID：{}", taskId);
 
-
-            long startTime = System.currentTimeMillis();
-            while (true) {
-                if (System.currentTimeMillis() - startTime > TASK_TIMEOUT_MS) {
-                    log.error("任务轮询超时，任务ID: {}", taskId);
-                    throw new RuntimeException("视频生成任务超时，请稍后重试。");
-                }
-                VideoSynthesisResult pollResult = videoSynthesis.fetch(taskId, qwenKey);
-                String taskStatus = pollResult.getOutput().getTaskStatus();
-                log.info("正在轮询... 任务ID: {}, 当前状态: {}", taskId, taskStatus);
-                log.info("任务状态：{}", JsonUtils.toJson(result));
-
-                // 根据任务状态进行判断
-                if ("SUCCEEDED".equals(taskStatus)) {
-                    log.info("任务成功完成！任务ID: {}", taskId);
-                    log.info("最终任务结果: {}", JsonUtils.toJson(pollResult.getOutput()));
-                    String videoUrl = pollResult.getOutput().getVideoUrl();
-                    log.info("视频地址：{}", videoUrl);
-                    return videoUrl; // 任务成功，返回视频URL
-                } else if ("FAILED".equals(taskStatus) || "CANCELED".equals(taskStatus)) {
-                    String errorMessage = pollResult.getOutput().getMessage();
-                    log.error("任务失败或被取消。任务ID: {}, 状态: {}, 失败信息: {}",
-                            taskId, taskStatus, errorMessage);
-                    throw new RuntimeException("视频生成任务失败或被取消: " + errorMessage);
-                }
-                // 如果任务仍在进行中 (RUNNING, PENDING)，则等待后继续轮询
-                Thread.sleep(POLLING_INTERVAL_MS);
+            return taskId;
+        } catch (ApiException | NoApiKeyException | InputRequiredException | IOException e) {
+            // 提交失败时，最好还是立即清理一下，避免留下垃圾文件
+            try {
+                if (firstFrameTemp != null) Files.deleteIfExists(firstFrameTemp);
+                if (lastFrameTemp != null) Files.deleteIfExists(lastFrameTemp);
+            } catch (IOException cleanupException) {
+                log.error("提交失败后清理临时文件也失败", cleanupException);
             }
-        } catch (ApiException | NoApiKeyException e){
-            throw new RuntimeException(e.getMessage());
-        } catch (InputRequiredException | IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("视频生成任务提交失败: " + e.getMessage());
         }
     }
+
+    @Override
+    public TaskStatusResponse getTaskResult(String taskId) {
+        try {
+            VideoSynthesis videoSynthesis = new VideoSynthesis();
+            VideoSynthesisResult pollResult = videoSynthesis.fetch(taskId, qwenKey);
+            String taskStatus = pollResult.getOutput().getTaskStatus();
+            log.info("轮询任务ID: {}, 当前状态: {}", taskId, taskStatus);
+
+            return switch (taskStatus) {
+                case "SUCCEEDED" -> TaskStatusResponse.success(taskId, pollResult.getOutput().getVideoUrl());
+                case "FAILED", "CANCELED" -> TaskStatusResponse.failed(taskId, pollResult.getOutput().getMessage());
+                default -> // PENDING, RUNNING
+                        TaskStatusResponse.running(taskId);
+            };
+        } catch (ApiException | NoApiKeyException e) {
+            log.error("轮询任务失败，任务ID: {}", taskId, e);
+            return TaskStatusResponse.failed(taskId, e.getMessage());
+        }
+    }
+
 }
