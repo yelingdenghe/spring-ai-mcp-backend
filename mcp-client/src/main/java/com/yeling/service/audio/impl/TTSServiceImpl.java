@@ -9,6 +9,7 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
 import com.yeling.service.audio.TTSService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -28,7 +29,8 @@ import java.net.URL;
 @Service
 @Slf4j
 public class TTSServiceImpl implements TTSService {
-    private static final String API_KEY = "sk-2e8a69e0acf3485cb115c699d16a5d6e";
+    @Value("${spring.ai.qwen.audio.api-key}")
+    private String API_KEY;
 
     @Override
     public byte[] tts(String content, String model) throws ApiException, NoApiKeyException, UploadFileException {

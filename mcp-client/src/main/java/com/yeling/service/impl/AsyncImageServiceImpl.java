@@ -11,6 +11,7 @@ import com.yeling.utils.SSEServe;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,10 @@ public class AsyncImageServiceImpl implements AsyncImageService {
     @Resource
     private MultiModelService multiModelService;
 
+    @Value("${spring.ai.qwen.api-key}")
+    private String API_KEY;
+
     private static final String BASE_URL = "https://api-inference.modelscope.cn/";
-    private static final String API_KEY = "ms-0b08dbea-3886-4a48-99a0-c9d652c2d14f";
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
 

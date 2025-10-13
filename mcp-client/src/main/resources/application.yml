@@ -37,6 +37,8 @@ spring:
             model: ${QWEN_MODEL}
       audio:
         api-key: ${QWEN_AUDIO_API_KEY}
+      video:
+        api-key: ${QWEN_VIDEL_API_KEY}
     zhipuai:
       api-key: ${ZHIPU_API_KRY}
       base-url: ${ZHIPU_BASE_URL}

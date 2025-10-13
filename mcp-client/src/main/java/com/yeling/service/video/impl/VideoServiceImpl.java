@@ -1,15 +1,13 @@
-package com.yeling.service.impl;
+package com.yeling.service.video.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yeling.entity.VideoRequest;
-import com.yeling.service.VideoService;
+import com.yeling.service.video.VideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +28,6 @@ public class VideoServiceImpl implements VideoService {
     private String zhipuKey;
 
     private static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4/";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private final RestTemplate restTemplate = new RestTemplate();
     // 声明 RestClient 实例
     private final RestClient restClient;
 

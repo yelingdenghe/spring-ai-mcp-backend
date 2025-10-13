@@ -1,4 +1,4 @@
-package com.yeling.service;
+package com.yeling.service.video;
 
 import com.yeling.entity.VideoRequest;
 
