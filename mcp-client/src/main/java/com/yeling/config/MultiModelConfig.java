@@ -5,6 +5,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -13,6 +14,7 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,22 +59,29 @@ public class MultiModelConfig {
     private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
 
     /**
-     * 默认 DeepSeek - 对话模型
+     * 将 DeepSeek 的 ChatModel 声明为一个独立的 Bean
      */
-    @Bean("deepseekClient")
-    public ChatClient deepseekClient(ToolCallbackProvider tools) {
+    @Bean("deepseekChatModel")
+    public ChatModel deepseekChatModel() {
         OpenAiApi api = OpenAiApi.builder()
                 .baseUrl(deepseekUrl)
                 .apiKey(deepseekKey)
                 .build();
-        OpenAiChatModel model = OpenAiChatModel.builder()
+        return OpenAiChatModel.builder()
                 .openAiApi(api)
                 .defaultOptions(OpenAiChatOptions.builder()
                         .model(deepseekModel)
                         .temperature(0.5)
                         .build())
                 .build();
-        return ChatClient.builder(model)
+    }
+
+    /**
+     * 默认 DeepSeek - 对话模型
+     */
+    @Bean("deepseekClient")
+    public ChatClient deepseekClient(@Qualifier("deepseekChatModel") ChatModel deepseekChatModel, ToolCallbackProvider tools) {
+        return ChatClient.builder(deepseekChatModel)
                 .defaultToolCallbacks(tools)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（DeepSeek）")
