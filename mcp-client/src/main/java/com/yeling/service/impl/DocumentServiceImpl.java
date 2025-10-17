@@ -9,7 +9,10 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.model.transformer.KeywordMetadataEnricher;
 import org.springframework.ai.model.transformer.SummaryMetadataEnricher;
+import org.springframework.ai.reader.JsonMetadataGenerator;
+import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
+import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
@@ -22,7 +25,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -59,11 +64,18 @@ public class DocumentServiceImpl implements DocumentService {
                 // 2. 将上传文件的内容复制到临时文件中
                 Files.copy(resource.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
 
-                // 3. 使用临时文件的URI来实例化MarkdownDocumentReader
-                MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(tempFile.toUri().toString());
+                // 3. 配置MarkdownDocumentReaderConfig
+                MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
+                        .withHorizontalRuleCreateDocument(true) // 是否根据水平线创建文档块
+                        .withIncludeCodeBlock(false) // 是否包含代码块
+                        .withIncludeBlockquote(false) // 是否包含引用
+                        .build();
+
+                // 4. 使用临时文件的URI来实例化MarkdownDocumentReader
+                MarkdownDocumentReader markdownReader = new MarkdownDocumentReader(tempFile.toUri().toString(), config);
                 List<Document> documents = markdownReader.get();
 
-                // 4. 执行ETL处理
+                // 5. 执行ETL处理
                 processAndLoadDocuments(documents, fileName);
 
             } catch (IOException e) {
@@ -78,6 +90,27 @@ public class DocumentServiceImpl implements DocumentService {
                     }
                 }
             }
+        } else if ("json".equalsIgnoreCase(fileExtension)) {
+            // 定义需要提取到元数据的特定字段
+            List<String> metadataKeys = List.of
+                    ("id", "technology_name", "field", "inventor", "launch_date", "description", "time", "desc");
+
+            // 创建一个自定义的元数据生成器
+            JsonMetadataGenerator metadataGenerator = (jsonMap) -> {
+                Map<String, Object> metadata = new HashMap<>();
+                for (String key : metadataKeys) {
+                    if (jsonMap.containsKey(key)) {
+                        metadata.put(key, jsonMap.get(key));
+                    }
+                }
+                return metadata;
+            };
+
+            JsonReader jsonReader = new JsonReader(resource, metadataGenerator);
+            List<Document> documents = jsonReader.get();
+            log.info("文件 '{}' 已被处理并分割成 {} 个文档块。", fileName, documents.size());
+            log.info("文件内容为 {} ", documents);
+            processAndLoadDocuments(documents, fileName);
         } else {
             // TikaDocumentReader 可以直接处理 Resource 输入流，无需创建临时文件
             TikaDocumentReader tikaReader = new TikaDocumentReader(resource);
