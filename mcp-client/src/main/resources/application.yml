@@ -45,6 +45,8 @@ spring:
       chat:
         options:
           model: ${ZHIPU_MODEL}
+          eval:
+            model: ${ZHIPU_EVAL_MODEL}
 
     model:
       embedding: transformers

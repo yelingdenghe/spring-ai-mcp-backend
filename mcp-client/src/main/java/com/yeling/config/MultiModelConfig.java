@@ -1,6 +1,5 @@
 package com.yeling.config;
 
-import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -8,8 +7,6 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.*;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
@@ -21,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author 夜凌
- * @Description: TODO
+ * @Description: 多模型配置
  * @ClassName MultiModelConfig
  * @Date 2025/10/8 20:53
  * @Version 1.0
@@ -55,6 +52,11 @@ public class MultiModelConfig {
 
      @Value("${spring.ai.zhipuai.chat.options.model}")
      private String zhipuModel;
+
+    @Value("${spring.ai.zhipuai.chat.options.eval.model}")
+    private String zhipuEvalModel;
+
+
 
     private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
 
@@ -130,6 +132,26 @@ public class MultiModelConfig {
                 .defaultToolCallbacks(tools)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（ZhiPuAi）")
+                .build();
+    }
+
+    /**
+     * ZhiPu 模型 - 评估模型
+     */
+    @Bean("zhipuEvalClient")
+    public ChatClient zhipuEvalClient() {
+        ZhiPuAiApi api = new ZhiPuAiApi(zhipuKey);
+
+        ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
+                .model(zhipuEvalModel)
+                .temperature(0.0)
+                .build();
+
+        ZhiPuAiChatModel model = new ZhiPuAiChatModel(api, options);
+
+        return ChatClient.builder(model)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .defaultSystem("你是一个极其专业的ai模型评估专家，你可以完美的评估任何ai模型，名字叫夜凌（ZhiPuAi）")
                 .build();
     }
 
