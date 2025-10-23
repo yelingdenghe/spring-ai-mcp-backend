@@ -1,6 +1,7 @@
 package com.yeling.service;
 
 import com.yeling.entity.ChatEntity;
+import com.yeling.entity.OperatorSummary;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -61,4 +62,6 @@ public interface ChatService {
      * @return: void
      **/
     void doInternetSearch(ChatEntity chat);
+
+    void doOperatorSearch(ChatEntity chat);;
 }

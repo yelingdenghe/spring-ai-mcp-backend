@@ -22,7 +22,6 @@ spring:
       client:
         observations:
           log-prompt: true # 记录聊天提示内容
-          log-completion: true # 记录聊天完成内容
       observations:
         log-prompt: true # 记录模型提示内容
         log-completion: true # 记录模型完成内容

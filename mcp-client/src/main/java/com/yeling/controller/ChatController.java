@@ -1,11 +1,12 @@
 package com.yeling.controller;
 
 import com.yeling.entity.ChatEntity;
+import com.yeling.entity.OperatorSummary;
 import com.yeling.service.ChatService;
+import com.yeling.utils.LeeResult;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 
 /**
  * @author 夜凌
@@ -15,14 +16,29 @@ import reactor.core.publisher.Flux;
  */
 @RestController
 @RequestMapping("chat")
+@Slf4j
 class ChatController {
 
     @Resource
     private ChatService chatService;
 
     @PostMapping("doChat")
-    public void doChat(@RequestBody ChatEntity chat) {
-        chatService.doChat(chat);
-    }
+    public void chat(@RequestBody ChatEntity chatEntity) {
 
+        String msg = chatEntity.getMessage();
+
+        // 简单的判断逻辑
+        if (msg.contains("是谁") || msg.contains("档案") || msg.contains("查询干员")
+                || msg.contains("真言") || msg.contains("阿米娅") || msg.contains("艾雅法拉")) { // 您可以添加更多关键词
+
+            log.info("检测到干员查询，转交 [doOperatorSearch]...");
+            // 这个方法会立即返回，并在后台通过SSE发送消息
+            chatService.doOperatorSearch(chatEntity);
+
+        } else {
+            // 如果不是查询干员，则执行普通聊天
+            log.info("执行普通聊天 [doChat]...");
+            chatService.doChat(chatEntity);
+        }
+    }
 }

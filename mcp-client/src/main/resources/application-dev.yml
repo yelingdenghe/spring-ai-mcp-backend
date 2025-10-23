@@ -2,4 +2,4 @@ server:
   port: 9009
 
 website:
-  domain: http://192.168.1.6:5500
+  domain: http://192.168.1.8:5500

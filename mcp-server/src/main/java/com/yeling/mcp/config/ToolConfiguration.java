@@ -1,5 +1,6 @@
 package com.yeling.mcp.config;
 
+import com.yeling.mcp.tool.ArknightsOperatorTool;
 import com.yeling.mcp.tool.DateTool;
 import com.yeling.mcp.tool.EmailTool;
 import com.yeling.mcp.tool.ProductTool;
@@ -21,10 +22,13 @@ import org.springframework.context.annotation.Configuration;
 public class ToolConfiguration {
 
     @Bean
-    public ToolCallbackProvider DateTools(DateTool dateToolEntity, EmailTool emailTool, ProductTool productTool) {
+    public ToolCallbackProvider DateTools(DateTool dateToolEntity,
+                                          EmailTool emailTool,
+                                          ProductTool productTool,
+                                          ArknightsOperatorTool arknightsOperatorTool) {
         return MethodToolCallbackProvider
                 .builder()
-                .toolObjects(dateToolEntity, emailTool, productTool)
+                .toolObjects(dateToolEntity, emailTool, productTool, arknightsOperatorTool)
                 .build();
     }
 }
