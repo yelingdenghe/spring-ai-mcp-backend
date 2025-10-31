@@ -28,8 +28,8 @@ class ChatController {
         String msg = chatEntity.getMessage();
 
         // 简单的判断逻辑
-        if (msg.contains("是谁") || msg.contains("档案") || msg.contains("查询干员")
-                || msg.contains("真言") || msg.contains("阿米娅") || msg.contains("艾雅法拉")) { // 您可以添加更多关键词
+        if (msg.contains("明日方舟") || msg.contains("档案") || msg.contains("干员") ||
+                msg.contains("PRTS")) { // 可以添加更多关键词
 
             log.info("检测到干员查询，转交 [doOperatorSearch]...");
             // 这个方法会立即返回，并在后台通过SSE发送消息

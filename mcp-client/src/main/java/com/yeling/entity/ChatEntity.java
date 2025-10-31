@@ -7,7 +7,7 @@ import lombok.ToString;
 
 /**
  * @author 夜凌
- * @Description: TODO
+ * @Description: 聊天实体
  * @ClassName ChatEntity
  * @Date 2025/10/1 19:07
  * @Version 1.0
@@ -22,6 +22,6 @@ public class ChatEntity {
     private String message;
     private String botMsgId;
 
-    private String modelName; // 新增字段，可选（deepseek / qwen）
+    private String modelName; // 可选（deepseek / qwen）
 
 }

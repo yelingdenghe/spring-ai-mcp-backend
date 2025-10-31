@@ -17,24 +17,6 @@ import java.util.List;
  * @Version 1.0
  */
 public interface ChatService {
-    
-    /**
-     * @description: 测试大模型交互聊天
-     * @author: 夜凌
-     * @date: 2025/9/30 10:25
-     * @param: [prompt]
-     * @return: java.lang.String
-     **/
-    String chatTest(String prompt);
-
-    /**
-     * @description: 测试大模型交互聊天-流式传输
-     * @author: 夜凌
-     * @date: 2025/9/30 10:23
-     * @param: [prompt]
-     * @return: reactor.core.publisher.Flux<org.springframework.ai.chat.model.ChatResponse>
-     **/
-    Flux<String> steamString(String prompt);
 
     /**
      * @description: 和大模型交互
@@ -63,5 +45,12 @@ public interface ChatService {
      **/
     void doInternetSearch(ChatEntity chat);
 
-    void doOperatorSearch(ChatEntity chat);;
+    /**
+     * @description: 大模型处理基于OpenAI的联网搜索关于MCP工具-明日方舟干员相关数据的数据集
+     * @author: 夜凌
+     * @date: 2025/10/5 18:12
+     * @param: [chat]
+     * @return: void
+     **/
+    void doOperatorSearch(ChatEntity chat);
 }

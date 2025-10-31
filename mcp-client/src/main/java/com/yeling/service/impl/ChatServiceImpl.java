@@ -35,38 +35,21 @@ import java.util.stream.Collectors;
 @Service
 public class ChatServiceImpl implements ChatService {
 
+    // 搜索服务
     @Resource
     private SearXngService searXngService;
 
+    // 多模型服务
     @Resource
     private MultiModelService multiModelService;
 
+    // 默认模型
     @Resource(name = "deepseekClient")
     private ChatClient deepseekClient;
 
     /** 获取对应模型的 ChatClient */
     private ChatClient getClient(String modelName) {
         return multiModelService.getChatClient(modelName);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String chatTest(String prompt) {
-        // 使用 ChatClient 的链式 API 进行调用，代码更简洁
-        return deepseekClient.prompt()
-                .user(prompt) // 设置用户输入
-                .call()       // 发起调用
-                .content();   // 直接获取返回的文本内容
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Flux<String> steamString(String prompt) {
-        return deepseekClient.prompt()
-                .user(u -> u
-                    .text(prompt))
-                .stream()
-                .content();
     }
 
     /** {@inheritDoc} */
@@ -92,6 +75,7 @@ public class ChatServiceImpl implements ChatService {
         SSEServe.sendMsg(userName, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
     }
 
+    // 知识库搜索提示词
     private static final String ragPROMPT = """
                 基于上下文的知识库内容回答问题：
                 【上下文】
@@ -108,7 +92,7 @@ public class ChatServiceImpl implements ChatService {
 
     /** {@inheritDoc} */
     @Override
-    public void doChatRagSearch(ChatEntity chat, List<Document> ragContext) {
+    public void  doChatRagSearch(ChatEntity chat, List<Document> ragContext) {
         ChatClient chatClient = getClient(chat.getModelName());
 
         String userName = chat.getCurrentUserName();
@@ -144,6 +128,7 @@ public class ChatServiceImpl implements ChatService {
 
     }
 
+    // 联网搜索提示词
     private static final String searXngPROMPT = """
                 你是一个互联网搜索大师，请基于以下互联网返回的结果作为上下文，请根据你的理解结合用户的提问综合后，生成并且输出专业的回答：
                 【上下文】
@@ -190,6 +175,13 @@ public class ChatServiceImpl implements ChatService {
         SSEServe.sendMsg(userName, SSEMsgType.FINISH, JSONUtil.toJsonStr(chatResponseEntity));
     }
 
+    /**
+     * @description: 构建联网搜索提示词
+     * @author: 夜凌
+     * @date: 2025/10/30 15:18
+     * @param: [question, searchResults]
+     * @return: String
+     **/
     private static String buildSearXngPrompt(String question, List<SearchResult> searchResults) {
 
         StringBuffer context = new StringBuffer();
@@ -206,6 +198,7 @@ public class ChatServiceImpl implements ChatService {
                 .replace("{question}", question);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void doOperatorSearch(ChatEntity chat) {
         String userName = chat.getCurrentUserName();
@@ -240,6 +233,13 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    /**
+     * @description: 获取结构化查询干员信息
+     * @author: 夜凌
+     * @date: 2025/10/30 15:17
+     * @param: [chatEntity]
+     * @return: OperatorSummary
+     **/
     public OperatorSummary getStructuredOperatorInfo(ChatEntity chatEntity) {
         log.info("调用方法 getStructuredOperatorInfo");
 
@@ -269,6 +269,13 @@ public class ChatServiceImpl implements ChatService {
         return summary;
     }
 
+    /**
+     * @description: 格式化干员文本
+     * @author: 夜凌
+     * @date: 2025/10/30 15:17
+     * @param: [summary]
+     * @return: String
+     **/
     public String formatSummaryAsText(OperatorSummary summary) {
         log.info("【SSE模式】开始格式化结构化查询结果为文本");
         StringBuilder sb = new StringBuilder();
