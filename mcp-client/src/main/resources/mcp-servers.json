@@ -1,12 +1,12 @@
 {
   "mcpServers": {
     "filesystem": {
-      "command": "F:\\Tools\\nvm\\nodejs\\node.exe",
+      "command": "${NODE_EXECUTABLE_PATH}",
       "args": [
-        "F:\\Tools\\nvm\\nodejs\\node_modules\\npm\\bin\\npx-cli.js",
+        "${NPX_CLI_PATH}",
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "F:\\study\\java\\2025\\SpringAI-MCP-RAG-Dev"
+        "${MCP_WORKSPACE_PATH}"
       ]
     }
   }
