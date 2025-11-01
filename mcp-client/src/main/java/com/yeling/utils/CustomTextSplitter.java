@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author 夜凌
- * @Description: TODO
+ * @Description: 自定义文本切分器
  * @ClassName CustomTextSplitter
  * @Date 2025/10/3 11:41
  * @Version 1.0

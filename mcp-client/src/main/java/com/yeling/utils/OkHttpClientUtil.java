@@ -34,6 +34,13 @@ public class OkHttpClientUtil {
         okHttpClient = getOkHttpClient;
     }
 
+    /**
+     * @description: get请求
+     * @author: 夜凌
+     * @date: 2025/10/31 17:58
+     * @param: [url, query, clazz]
+     * @return: T
+     **/
     public static <T> T doGet(String url, String query, Class<T> clazz) {
         // 构建url
         HttpUrl build = HttpUrl.get(url)

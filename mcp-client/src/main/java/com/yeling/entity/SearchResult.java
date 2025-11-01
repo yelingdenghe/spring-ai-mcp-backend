@@ -7,7 +7,7 @@ import lombok.ToString;
 
 /**
  * @author 夜凌
- * @Description: TODO
+ * @Description: 联网搜索结果实体映射
  * @ClassName SearchResult
  * @Date 2025/10/5 09:40
  * @Version 1.0

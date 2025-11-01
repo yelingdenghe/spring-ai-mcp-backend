@@ -159,8 +159,6 @@ public class ChatServiceImpl implements ChatService {
         // 组装提示词
         Prompt prompt = new Prompt(searXngPROMPT);
 
-        System.out.println(prompt);
-
         Flux<String> content = chatClient.prompt(prompt).stream().content();
 
         List<String> list = content.toStream().peek(chatResponse -> {
@@ -186,12 +184,10 @@ public class ChatServiceImpl implements ChatService {
 
         StringBuffer context = new StringBuffer();
 
-        searchResults.forEach(searchResult -> {
-            context.append(
-                    String.format("<context>\n[来源] %s \n[摘要] %s \n</context>\n",
-                            searchResult.getUrl(),
-                            searchResult.getContent()));
-        });
+        searchResults.forEach(searchResult -> context.append(
+                String.format("<context>\n[来源] %s \n[摘要] %s \n</context>\n",
+                        searchResult.getUrl(),
+                        searchResult.getContent())));
 
         return searXngPROMPT
                 .replace("{context}", context)

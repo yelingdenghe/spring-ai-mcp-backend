@@ -13,6 +13,13 @@ import java.util.List;
  */
 public interface SearXngService {
 
+    /**
+     * @description: 调用搜索引擎进行搜索
+     * @author: 夜凌
+     * @date: 2025/10/31 17:50
+     * @param: [query]
+     * @return: List<SearchResult>
+     **/
     List<SearchResult> search(String query);
 
 }

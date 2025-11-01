@@ -37,7 +37,7 @@ public interface ChatService {
     void doChatRagSearch(ChatEntity chat, List<Document> ragContext);
     
     /**
-     * @description: 大模型处理基于SearXNG的联网搜索数据集
+     * @description: 大模型处理基于SearXNG的联网搜索数据集 -- User -> SearXNG -> LLM
      * @author: 夜凌
      * @date: 2025/10/5 18:12
      * @param: [chat]

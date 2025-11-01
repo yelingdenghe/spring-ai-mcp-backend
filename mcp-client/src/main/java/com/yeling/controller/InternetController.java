@@ -22,15 +22,7 @@ import org.springframework.web.bind.annotation.*;
 class InternetController {
 
     @Resource
-    private SearXngService searXngService;
-
-    @Resource
     private ChatService chatService;
-
-    @GetMapping("/test")
-    public Object test(@RequestParam("query") String query) {
-        return searXngService.search(query);
-    }
 
     @PostMapping("/search")
     public void search(@RequestBody ChatEntity chatEntity, HttpServletResponse response) {
