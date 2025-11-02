@@ -24,11 +24,12 @@ public class EvaluationController {
     private EvaluationService evaluationService;
 
     /**
-     * 评估 RAG 流程的相关性
-     * 
-     * @param request 评估请求，包含用户问题、AI 响应、上下文文档
-     * @return 评估结果
-     */
+     * @description: 评估 RAG 流程的相关性
+     * @author: 夜凌
+     * @date: 2025/11/1 16:05
+     * @param: [request] 评估请求，包含用户问题、AI 响应、上下文文档
+     * @return: LeeResult 评估结果
+     **/
     @PostMapping("/rag/relevancy")
     public LeeResult evaluateRagRelevancy(@RequestBody com.yeling.entity.EvaluationRequest request) {
         log.info("收到 RAG 相关性评估请求");

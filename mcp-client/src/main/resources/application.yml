@@ -17,27 +17,11 @@ spring:
               sse-endpoint: /sse
         stdio:
           servers-configuration: classpath:mcp-servers.json
-    # Spring AI 可观测性配置
-    chat:
-      client:
-        observations:
-          log-prompt: true # 记录聊天提示内容
-      observations:
-        log-prompt: true # 记录模型提示内容
-        log-completion: true # 记录模型完成内容
-    image:
-      observations:
-        log-prompt: false # 图像提示通常较大，默认不记录
     vectorstore:
       redis:
         initialize-schema: true
         index-name: my-vector-index
         prefix: 'embedding:'
-      observations:
-        log-query-response: true # 记录向量搜索响应
-    tools:
-      observations:
-        include-content: true # 记录工具调用
 
     openai:
       api-key: ${OPENAI_API_KEY}

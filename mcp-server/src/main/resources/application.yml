@@ -4,8 +4,8 @@ spring:
   profiles:
     active: dev
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource  # 数据源类型
+    driver-class-name: com.mysql.cj.jdbc.Driver  # 数据库驱动
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/springai-items-mcp?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
@@ -32,10 +32,10 @@ spring:
           prompt: true
           completion: true
   mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST}  # 邮箱host
+    port: ${MAIL_PORT}  # 邮箱port
+    username: ${MAIL_USERNAME}  # 邮箱用户名
+    password: ${MAIL_PASSWORD}  # 邮箱密码
     properties:
       mail:
         smtp:
@@ -49,10 +49,10 @@ logging:
     root: info
 mybatis-plus:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印sql
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印sql
   global-config:
     db-config:
-      id-type: assign_id # 主键策略 - 默认自增
-      update-strategy: not_empty # 更新策略 - 默认非空
-  mapper-locations: classpath*:/mapper/**/*.xml # 扫描的mapper
+      id-type: assign_id  # 主键策略 - 默认自增
+      update-strategy: not_empty  # 更新策略 - 默认非空
+  mapper-locations: classpath*:/mapper/**/*.xml  # 扫描的mapper
 

@@ -9,5 +9,5 @@ scrape_configs:
     static_configs:
       - targets: ['host.docker.internal:9009'] # 目标应用地址和端口
     # 注意: host.docker.internal 是 Docker Desktop 提供的一个特殊 DNS 名称，
-    # 它会解析为你宿主机（Windows）的内部 IP 地址。
-    # 9009 是你 Spring Boot 应用 (mcp-client) 的端口号
+    # 它会解析宿主机（Windows）的内部 IP 地址。
+    # 9009 是 Spring Boot 应用 (mcp-client) 的端口号

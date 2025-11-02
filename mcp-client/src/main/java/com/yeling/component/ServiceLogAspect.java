@@ -19,7 +19,7 @@ import org.springframework.util.StopWatch;
 class ServiceLogAspect {
 
     /**
-     * @description:
+     * @description: 记录方法执行时间
      * @author: 夜凌
      * @date: 2025/9/30 19:04
      * @param: [joinPoint]

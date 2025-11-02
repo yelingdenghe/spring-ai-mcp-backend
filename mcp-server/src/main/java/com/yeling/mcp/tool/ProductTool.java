@@ -135,6 +135,7 @@ public class ProductTool {
             if (dbColumn != null) {
                 // 如果sortEnum为空，String.valueOf会返回"null"，equalsIgnoreCase("DESC")为false，isAsc为true，默认升序。
                 boolean isAsc = !"DESC".equalsIgnoreCase(String.valueOf(request.getSortOrder()));
+                // 是否应用该排序，使用的排序方向和字段名
                 queryWrapper.orderBy(true, isAsc, dbColumn);
             }
         }
