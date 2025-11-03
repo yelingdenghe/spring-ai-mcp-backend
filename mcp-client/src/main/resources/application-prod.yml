@@ -1,2 +1,25 @@
 server:
-  port: 7070
+  port: 9009
+
+website:
+  domain: ${WEBSITE_DOMAIN_PROD}
+
+spring:
+  ai:
+    mcp:
+      client:
+        type: async
+        sse:
+          connections:
+            server1:
+              url: https://mcp.amap.com
+              sse-endpoint: /sse?key=${AMAP_API_KEY}
+            server2:
+              url: http://mcp-server:9060 # docker不同容器通信，要在同一个自定义网络中
+              sse-endpoint: /sse
+
+internet:
+  websearch:
+    searxng:
+      url: http://searxng:6080/search
+      counts: 25

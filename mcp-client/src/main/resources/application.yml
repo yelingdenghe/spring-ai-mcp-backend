@@ -2,21 +2,8 @@ spring:
   application:
     name: spring-ai-mcp-client
   profiles:
-    active: dev
+    active: prod
   ai:
-    mcp:
-      client:
-        type: async
-        sse:
-          connections:
-            server1:
-              url: https://mcp.amap.com
-              sse-endpoint: /sse?key=${AMAP_API_KEY}
-            server2:
-              url: http://localhost:9001
-              sse-endpoint: /sse
-        stdio:
-          servers-configuration: classpath:mcp-servers.json
     vectorstore:
       redis:
         initialize-schema: true
@@ -73,12 +60,6 @@ spring:
 logging:
   level:
     root: info
-
-internet:
-  websearch:
-    searxng:
-      url: http://localhost:6080/search
-      counts: 25
 
 ok:
   http:

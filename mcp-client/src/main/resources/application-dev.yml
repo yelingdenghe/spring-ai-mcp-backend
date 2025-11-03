@@ -2,4 +2,26 @@ server:
   port: 9009
 
 website:
-  domain: ${WEBSITE_DOMAIN:http://localhost:5500}
+  domain: ${WEBSITE_DOMAIN_DEV:http://localhost:5500}
+
+spring:
+  ai:
+    mcp:
+      client:
+        type: async
+        sse:
+          connections:
+            server1:
+              url: https://mcp.amap.com
+              sse-endpoint: /sse?key=${AMAP_API_KEY}
+            server2:
+              url: http://localhost:9060
+              sse-endpoint: /sse
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
+
+internet:
+  websearch:
+    searxng:
+      url: http://localhost:6080/search
+      counts: 25
