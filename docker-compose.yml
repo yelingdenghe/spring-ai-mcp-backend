@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # ------------------------------------
+  # mcp-client 服务
+  # ------------------------------------
+  client:
+    # 使用 build 指令，指定上下文为当前目录(.)，Dockerfile 为创建的 Dockerfile-client
+    build:
+      context: .
+      dockerfile: mcp-client/Dockerfile
+    container_name: mcp-client
+    ports:
+      # 将主机的 9009 端口映射到容器的 9009 端口
+      # 格式： "主机端口:容器端口"
+      - "9009:9009"
+    volumes:
+      # !!! 解决 ONNX 问题的关键 !!!
+      # ...挂载到容器的 /app 目录 (即 Dockerfile 中定义的 WORKDIR)。
+      # 当 Java 进程在 /app 目录启动时，它会发现 /app/model.onnx 和 /app/model.onnx_data
+      # 这样就满足了 "model.onnx_data 需与 model.onnx 置于同一目录下" 且在 "运行 Boot 应用的目录中" 的要求。
+      - /home/ubuntu/ai/models/qwen-embedding:/app
+    restart: always
+    networks:
+      - springai
+
+  # ------------------------------------
+  # mcp-server 服务
+  # ------------------------------------
+  server:
+    build:
+      context: .
+      dockerfile: mcp-server/Dockerfile
+    container_name: mcp-server
+    ports:
+      # 映射端口
+      - "9060:9060"
+    # (如果 mcp-server 也需要模型, 取消注释下面的 volumes 和 environment)
+    # volumes:
+    #   - /home/ubuntu/ai/models/qwen-embedding:/app
+    # environment:
+    #   - EMBEDDING_TOKENIZER_URL=file:/app/tokenizer.json
+    #   - EMBEDDING_ONNX_MODEL_URL=file:/app/model.onnx
+    restart: always
+    networks:
+      - springai
+
+networks:
+  # 声明 'springai' 是一个外部网络
+  # Docker Compose 不会尝试创建它，而是直接使用已存在的同名网络
+  springai:
+    external: true

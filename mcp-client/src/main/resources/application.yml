@@ -36,15 +36,6 @@ spring:
           eval:
             model: ${ZHIPU_EVAL_MODEL}
 
-    model:
-      embedding: transformers
-    embedding:
-      transformer:
-        tokenizer:
-          uri: ${EMBEDDING_TOKENIZER_URL}
-        onnx:
-          model-uri: ${EMBEDDING_ONNX_MODEL_URL}
-          model-output-name: token_embeddings
   servlet:
     multipart:
       max-file-size: 10MB

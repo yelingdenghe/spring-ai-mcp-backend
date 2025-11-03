@@ -17,6 +17,15 @@ spring:
             server2:
               url: http://mcp-server:9060 # docker不同容器通信，要在同一个自定义网络中
               sse-endpoint: /sse
+    model:
+      embedding: transformers
+    embedding:
+      transformer:
+        tokenizer:
+          uri: ${EMBEDDING_TOKENIZER_URL_PROD}
+        onnx:
+          model-uri: ${EMBEDDING_ONNX_MODEL_URL_PROD}
+          model-output-name: token_embeddings
 
 internet:
   websearch:

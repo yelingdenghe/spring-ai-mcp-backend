@@ -19,6 +19,15 @@ spring:
               sse-endpoint: /sse
         stdio:
           servers-configuration: classpath:mcp-servers.json
+    model:
+      embedding: transformers
+    embedding:
+      transformer:
+        tokenizer:
+          uri: ${EMBEDDING_TOKENIZER_URL}
+        onnx:
+          model-uri: ${EMBEDDING_ONNX_MODEL_URL}
+          model-output-name: token_embeddings
 
 internet:
   websearch:
