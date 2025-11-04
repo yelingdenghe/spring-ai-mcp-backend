@@ -20,6 +20,33 @@ services:
       # 当 Java 进程在 /app 目录启动时，它会发现 /app/model.onnx 和 /app/model.onnx_data
       # 这样就满足了 "model.onnx_data 需与 model.onnx 置于同一目录下" 且在 "运行 Boot 应用的目录中" 的要求。
       - /home/ubuntu/ai/models/qwen-embedding:/app
+    environment:
+      # OpenAI 配置
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - OPENAI_MODEL=${OPENAI_MODEL}
+      # Qwen 配置
+      - QWEN_API_KEY=${QWEN_API_KEY}
+      - QWEN_BASE_URL=${QWEN_BASE_URL}
+      - QWEN_MODEL=${QWEN_MODEL}
+      - QWEN_AUDIO_API_KEY=${QWEN_AUDIO_API_KEY}
+      - QWEN_VIDEL_API_KEY=${QWEN_VIDEL_API_KEY}
+      # 智谱AI 配置
+      - ZHIPU_API_KRY=${ZHIPU_API_KRY}
+      - ZHIPU_BASE_URL=${ZHIPU_BASE_URL}
+      - ZHIPU_MODEL=${ZHIPU_MODEL}
+      - ZHIPU_EVAL_MODEL=${ZHIPU_EVAL_MODEL}
+      # Redis 配置
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      # 网站域名
+      - WEBSITE_DOMAIN_PROD=${WEBSITE_DOMAIN_PROD}
+      # ONNX 模型路径
+      - EMBEDDING_TOKENIZER_URL_PROD=${EMBEDDING_TOKENIZER_URL_PROD}
+      - EMBEDDING_ONNX_MODEL_URL_PROD=${EMBEDDING_ONNX_MODEL_URL_PROD}
+      # 高德地图 API Key
+      - AMAP_API_KEY=${AMAP_API_KEY}
     restart: always
     networks:
       - springai
@@ -35,6 +62,17 @@ services:
     ports:
       # 映射端口
       - "9060:9060"
+    environment:
+      # 数据库配置（使用已存在的 mysql 容器）
+      - MYSQL_HOST_PROD=mysql
+      - MYSQL_PORT_PROD=3306
+      - MYSQL_USER_PROD=${MYSQL_USER}
+      - MYSQL_PASSWORD_PROD=${MYSQL_PASSWORD}
+      # 邮件配置
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     # (如果 mcp-server 也需要模型, 取消注释下面的 volumes 和 environment)
     # volumes:
     #   - /home/ubuntu/ai/models/qwen-embedding:/app
@@ -44,6 +82,26 @@ services:
     restart: always
     networks:
       - springai
+    depends_on:
+      - client
+
+  # ------------------------------------
+  # frontend 前端服务
+  # ------------------------------------
+  frontend:
+    build:
+      context: ../spring-ai-frontend-vue
+      dockerfile: Dockerfile
+    container_name: spring-ai-frontend
+    ports:
+      # 将主机的 5500 端口映射到容器的 80 端口（nginx 默认端口）
+      - "5500:80"
+    restart: always
+    networks:
+      - springai
+    depends_on:
+      - client
+      - server
 
 networks:
   # 声明 'springai' 是一个外部网络
