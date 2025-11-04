@@ -19,6 +19,9 @@ services:
       # ...挂载到容器的 /app 目录 (即 Dockerfile 中定义的 WORKDIR)。
       # 当 Java 进程在 /app 目录启动时，它会发现 /app/model.onnx 和 /app/model.onnx_data
       # 这样就满足了 "model.onnx_data 需与 model.onnx 置于同一目录下" 且在 "运行 Boot 应用的目录中" 的要求。
+      # 
+      # Windows 开发环境示例: - F:/study/java/2025/SpringAI-MCP-RAG-Dev:/app
+      # Linux 部署环境使用: - /home/ubuntu/ai/models/qwen-embedding:/app
       - /home/ubuntu/ai/models/qwen-embedding:/app
     restart: always
     networks:
@@ -52,7 +55,9 @@ services:
   # ------------------------------------
   frontend:
     build:
-      context: F:\study\vue\spring-ai-frontend-vue
+      # 使用相对路径（从当前 docker-compose.yml 所在目录计算）
+      # 目录结构：study/java/2025/SpringAI-MCP-RAG-Dev -> study/vue/spring-ai-frontend-vue
+      context: ../../../vue/spring-ai-frontend-vue
       dockerfile: Dockerfile.simple  # 简化版 - 使用服务器本地构建的 dist 目录
     container_name: spring-ai-frontend
     ports:
