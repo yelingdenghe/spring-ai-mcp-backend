@@ -16,13 +16,21 @@ services:
       - "9009:9009"
     volumes:
       # !!! 解决 ONNX 问题的关键 !!!
-      # ...挂载到容器的 /app 目录 (即 Dockerfile 中定义的 WORKDIR)。
-      # 当 Java 进程在 /app 目录启动时，它会发现 /app/model.onnx 和 /app/model.onnx_data
-      # 这样就满足了 "model.onnx_data 需与 model.onnx 置于同一目录下" 且在 "运行 Boot 应用的目录中" 的要求。
+      # 挂载到 /app/models 子目录，避免覆盖 jar 文件
+      # 模型文件会在: /app/models/model.onnx 和 /app/models/model.onnx_data
       # 
-      # Windows 开发环境示例: - F:/study/java/2025/SpringAI-MCP-RAG-Dev:/app
-      # Linux 部署环境使用: - /home/ubuntu/ai/models/qwen-embedding:/app
-      - /home/ubuntu/ai/models/qwen-embedding:/app
+      # Windows 开发环境示例: - F:/study/java/2025/SpringAI-MCP-RAG-Dev:/app/models
+      # Linux 部署环境使用: - /home/ubuntu/ai/models/qwen-embedding:/app/models
+      - /home/ubuntu/ai/models/qwen-embedding:/app/models
+    environment:
+      # 指定模型文件路径
+      - EMBEDDING_TOKENIZER_URL_PROD=file:/app/models/tokenizer.json
+      - EMBEDDING_ONNX_MODEL_URL_PROD=file:/app/models/model.onnx
+    # 如果需要加载环境变量文件，取消注释以下行（根据实际情况选择 .env 文件）
+    env_file:
+      - ./mcp-client/src/main/resources/.env
+    #   或者
+    #   - ./mcp-client/src/main/resources/.env_qwen
     restart: always
     networks:
       - springai
@@ -41,9 +49,8 @@ services:
     # (如果 mcp-server 也需要模型, 取消注释下面的 volumes 和 environment)
     # volumes:
     #   - /home/ubuntu/ai/models/qwen-embedding:/app
-    # environment:
-    #   - EMBEDDING_TOKENIZER_URL=file:/app/tokenizer.json
-    #   - EMBEDDING_ONNX_MODEL_URL=file:/app/model.onnx
+    env_file:
+      - ./mcp-server/src/main/resources/.env
     restart: always
     networks:
       - springai
