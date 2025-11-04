@@ -90,8 +90,8 @@ services:
   # ------------------------------------
   frontend:
     build:
-      context: ../spring-ai-frontend-vue
-      dockerfile: Dockerfile
+      context: F:\study\vue\spring-ai-frontend-vue
+      dockerfile: Dockerfile.simple  # 简化版 - 使用服务器本地构建的 dist 目录
     container_name: spring-ai-frontend
     ports:
       # 将主机的 5500 端口映射到容器的 80 端口（nginx 默认端口）
