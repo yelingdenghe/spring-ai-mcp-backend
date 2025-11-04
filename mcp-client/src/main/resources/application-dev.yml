@@ -2,7 +2,7 @@ server:
   port: 9009
 
 website:
-  domain: ${WEBSITE_DOMAIN_DEV:http://localhost:5500}
+  domain: ${WEBSITE_DOMAIN_DEV:http://localhost:5173}
 
 spring:
   ai:
