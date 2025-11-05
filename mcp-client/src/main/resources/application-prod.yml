@@ -12,9 +12,6 @@ spring:
         sse:
           connections:
             server1:
-              url: https://mcp.amap.com
-              sse-endpoint: /sse?key=${AMAP_API_KEY}
-            server2:
               url: http://mcp-server:9060 # docker不同容器通信，要在同一个自定义网络中
               sse-endpoint: /sse
     model:
@@ -30,5 +27,5 @@ spring:
 internet:
   websearch:
     searxng:
-      url: http://searxng:6080/search
+      url: http://searxng:8080/search
       counts: 25
