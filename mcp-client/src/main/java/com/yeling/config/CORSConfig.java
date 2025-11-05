@@ -18,13 +18,27 @@ class CORSConfig implements WebMvcConfigurer {
     @Value("${website.domain}")
     private String domain;
 
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins(domain)
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
+        if ("dev".equals(activeProfile)) {
+            // 开发环境：允许所有源（便于本地开发）
+            registry.addMapping("/**")
+                    .allowedOriginPatterns("*")
+                    .allowedMethods("*")
+                    .allowedHeaders("*")
+                    .allowCredentials(true)
+                    .maxAge(3600);
+        } else {
+            // 生产环境：仅允许指定域名
+            registry.addMapping("/**")
+                    .allowedOrigins(domain)
+                    .allowedMethods("*")
+                    .allowedHeaders("*")
+                    .allowCredentials(true)
+                    .maxAge(3600);
+        }
     }
 }
