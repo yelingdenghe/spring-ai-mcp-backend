@@ -2,7 +2,7 @@ spring:
   application:
     name: spring-ai-mcp-client
   profiles:
-    active: prod
+    active: dev
   ai:
     vectorstore:
       redis:

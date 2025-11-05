@@ -17,14 +17,16 @@ spring:
         stdio:
           servers-configuration: classpath:mcp-servers.json
     model:
-      embedding: transformers
-    embedding:
-      transformer:
-        tokenizer:
-          uri: ${EMBEDDING_TOKENIZER_URL}
-        onnx:
-          model-uri: ${EMBEDDING_ONNX_MODEL_URL}
-          model-output-name: token_embeddings
+      embedding: ollama
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        options:
+          model: sam860/qwen3-embedding:0.6b-F16
+    spring:
+      cloud:
+        bindings:
+
 
 internet:
   websearch:
