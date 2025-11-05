@@ -1,7 +1,6 @@
 package com.yeling.controller;
 
 import com.yeling.entity.AsrUrlRequest;
-import com.yeling.service.ChatService;
 import com.yeling.service.audio.AsrService;
 import com.yeling.service.audio.TTSService;
 import com.yeling.utils.LeeResult;
@@ -35,9 +34,6 @@ public class AudioController {
 
     @Resource
     private AsrService asrService;
-
-    @Resource
-    private ChatService chatService;
 
     @GetMapping("/tts")
     public ResponseEntity<byte[]> generate(@RequestParam String content, 
