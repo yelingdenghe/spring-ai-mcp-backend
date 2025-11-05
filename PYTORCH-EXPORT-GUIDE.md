@@ -60,7 +60,7 @@ mkdir -p /home/ubuntu/ai/pytorch-libs-export
 docker cp mcp-client:/root/.djl.ai/. /home/ubuntu/ai/pytorch-libs-export/
 
 # 验证文件
-ls -lh /home/ubuntu/ai/pytorch-libs-export/pytorch/2.5.1/cpu/linux-x86_64/native/lib/
+ls -lh /home/ubuntu/ai/pytorch-libs-export/pytorch/2.5.1-cpu-linux-x86_64/
 ```
 
 **预期输出：**
