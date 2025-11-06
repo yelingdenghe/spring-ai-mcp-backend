@@ -23,10 +23,6 @@ spring:
       embedding:
         options:
           model: sam860/qwen3-embedding:0.6b-F16
-    spring:
-      cloud:
-        bindings:
-
 
 internet:
   websearch:
