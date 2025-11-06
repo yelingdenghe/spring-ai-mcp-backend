@@ -47,6 +47,15 @@ spring:
       port: ${REDIS_PORT}
       username: default
       password: ${REDIS_PASSWORD}
+      timeout: 600000  # 连接超时时间（毫秒），增加到600秒
+      jedis:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 200000  # 获取连接的最大等待时间（毫秒）
+      connect-timeout: 200000  # 连接超时（毫秒）
+      client-type: jedis
 
 logging:
   level:

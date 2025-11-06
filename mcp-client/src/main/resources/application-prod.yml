@@ -14,6 +14,13 @@ spring:
             server1:
               url: http://mcp-server:9060 # docker不同容器通信，要在同一个自定义网络中
               sse-endpoint: /sse
+    model:
+      embedding: ollama
+    ollama:
+      base-url: http://localhost:11434
+      embedding:
+        options:
+          model: qwen3-embedding:0.6b
 
 internet:
   websearch:

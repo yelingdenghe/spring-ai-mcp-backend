@@ -26,7 +26,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author 夜凌
@@ -122,21 +121,85 @@ public class DocumentServiceImpl implements DocumentService {
      * 将ETL的转换和加载阶段封装成一个私有方法，以提高代码复用性
      */
     private void processAndLoadDocuments(List<Document> documents, String fileName) {
+        log.info("====== 开始处理文档 '{}' ======", fileName);
+        log.info("初始文档数量: {}", documents.size());
+        
+        // 1. 添加文件名元数据
         documents.forEach(document -> document.getMetadata().put("fileName", fileName));
+        log.info("已为所有文档添加fileName元数据");
 
+        // 2. 创建转换器
+        log.info("开始创建ETL转换器...");
         var summaryEnricher = new SummaryMetadataEnricher(chatModel, List.of(SummaryMetadataEnricher.SummaryType.CURRENT));
         var keywordEnricher = new KeywordMetadataEnricher(chatModel, 5);
         var textSplitter = new TokenTextSplitter(800, 350, 5, 10000, true);
+        log.info("ETL转换器创建完成");
 
-        Function<List<Document>, List<Document>> transformerChain = summaryEnricher
-                .andThen(keywordEnricher)
-                .andThen(textSplitter);
+        // 3. 执行摘要增强（耗时操作）
+        log.info("开始执行摘要增强处理，这可能需要较长时间...");
+        long startTime = System.currentTimeMillis();
+        List<Document> summaryEnrichedDocs = summaryEnricher.apply(documents);
+        long summaryTime = System.currentTimeMillis() - startTime;
+        log.info("摘要增强完成，耗时: {} ms，文档数量: {}", summaryTime, summaryEnrichedDocs.size());
 
-        List<Document> processedDocuments = transformerChain.apply(documents);
-        log.info("文件 '{}' 已被处理并分割成 {} 个文档块。", fileName, processedDocuments.size());
+        // 4. 执行关键词提取（耗时操作）
+        log.info("开始执行关键词提取...");
+        startTime = System.currentTimeMillis();
+        List<Document> keywordEnrichedDocs = keywordEnricher.apply(summaryEnrichedDocs);
+        long keywordTime = System.currentTimeMillis() - startTime;
+        log.info("关键词提取完成，耗时: {} ms，文档数量: {}", keywordTime, keywordEnrichedDocs.size());
 
-        redisVectorStore.add(processedDocuments);
-        log.info("{} 个文档块已成功加载到Redis向量数据库。", processedDocuments.size());
+        // 5. 执行文本分割
+        log.info("开始执行文本分割...");
+        startTime = System.currentTimeMillis();
+        List<Document> processedDocuments = textSplitter.apply(keywordEnrichedDocs);
+        long splitTime = System.currentTimeMillis() - startTime;
+        log.info("文本分割完成，耗时: {} ms，最终文档块数量: {}", splitTime, processedDocuments.size());
+
+        // 6. 计算文档总大小（用于诊断）
+        try {
+            long totalContentSize = processedDocuments.stream()
+                    .mapToLong(doc -> doc.getFormattedContent().length())
+                    .sum();
+            log.info("所有文档块的总内容大小: {} 字符 ({} KB)", totalContentSize, totalContentSize / 1024);
+        } catch (Exception e) {
+            log.warn("无法计算文档总大小: {}", e.getMessage());
+        }
+
+        // 7. 分批写入Redis，避免一次性写入过多数据导致连接中断
+        int batchSize = 5; // 每批处理5个文档
+        int totalBatches = (int) Math.ceil((double) processedDocuments.size() / batchSize);
+        log.info("开始分批写入Redis，总批次: {}，每批大小: {}", totalBatches, batchSize);
+
+        for (int i = 0; i < processedDocuments.size(); i += batchSize) {
+            int currentBatch = (i / batchSize) + 1;
+            int endIndex = Math.min(i + batchSize, processedDocuments.size());
+            List<Document> batch = processedDocuments.subList(i, endIndex);
+            
+            log.info("正在写入第 {}/{} 批，包含 {} 个文档块 (索引 {} - {})", 
+                    currentBatch, totalBatches, batch.size(), i, endIndex - 1);
+            
+            try {
+                startTime = System.currentTimeMillis();
+                redisVectorStore.add(batch);
+                long writeTime = System.currentTimeMillis() - startTime;
+                log.info("第 {}/{} 批写入成功，耗时: {} ms", currentBatch, totalBatches, writeTime);
+            } catch (Exception e) {
+                log.error("第 {}/{} 批写入Redis失败，尝试重试一次...", currentBatch, totalBatches, e);
+                
+                // 重试一次
+                try {
+                    Thread.sleep(1000); // 等待1秒后重试
+                    redisVectorStore.add(batch);
+                    log.info("第 {}/{} 批重试写入成功", currentBatch, totalBatches);
+                } catch (Exception retryException) {
+                    log.error("第 {}/{} 批重试写入仍然失败，跳过该批次", currentBatch, totalBatches, retryException);
+                    throw new RuntimeException("写入Redis失败: 批次 " + currentBatch + "/" + totalBatches, retryException);
+                }
+            }
+        }
+
+        log.info("====== 文档 '{}' 处理完成，共 {} 个文档块已成功加载到Redis ======", fileName, processedDocuments.size());
     }
 
 
