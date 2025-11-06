@@ -2,9 +2,7 @@ package com.yeling.service.impl;
 
 import com.yeling.service.DocumentService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.model.transformer.KeywordMetadataEnricher;
@@ -43,6 +41,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final RedisVectorStore redisVectorStore;
     private final ChatModel chatModel;
+
 
     public DocumentServiceImpl(RedisVectorStore redisVectorStore,
                                @Qualifier("deepseekChatModel") ChatModel chatModel) {

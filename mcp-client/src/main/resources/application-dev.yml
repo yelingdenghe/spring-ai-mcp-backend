@@ -22,7 +22,7 @@ spring:
       base-url: http://localhost:11434
       embedding:
         options:
-          model: sam860/qwen3-embedding:0.6b-F16
+          model: qwen3-embedding:0.6b
 
 internet:
   websearch:
