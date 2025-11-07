@@ -1,4 +1,6 @@
 target/
+mcp-server/src/main/resources/.env
+mcp-client/src/main/resources/.env
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
