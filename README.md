@@ -689,30 +689,6 @@ environment:
 
 ---
 
-## 📄 许可证
-
-本项目采用 [MIT License](LICENSE) 开源许可证。
-
----
-
-## 💬 联系方式
-
-如有问题或建议，请通过以下方式联系：
-
-- 📧 Email: your-email@example.com
-- 🐛 Issues: [GitHub Issues](https://github.com/your-username/SpringAI-MCP-RAG-Dev/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/your-username/SpringAI-MCP-RAG-Dev/discussions)
-
----
-
-## 🌟 Star History
-
-如果这个项目对你有帮助，请给个 ⭐️ Star 支持一下！
-
-[![Star History Chart](https://api.star-history.com/svg?repos=your-username/SpringAI-MCP-RAG-Dev&type=Date)](https://star-history.com/#your-username/SpringAI-MCP-RAG-Dev&Date)
-
----
-
 <div align="center">
 
 **Made with ❤️ by Yeling**
