@@ -17,12 +17,14 @@ services:
     volumes:
       # !!! 解决 ONNX 问题的关键 !!!
       # 挂载到 /app/models 子目录，避免覆盖 jar 文件
-      - /home/ubuntu/ai/models/qwen-embedding:/app/models
+#      - /home/ubuntu/ai/models/qwen-embedding:/app/models
       - /home/ubuntu/ai/pytorch-libs:/root/.djl.ai
     environment:
-      # Embedding 模型路径配置（生产环境）
-      - EMBEDDING_TOKENIZER_URL_PROD=file:/app/models/tokenizer.json
-      - EMBEDDING_ONNX_MODEL_URL_PROD=file:/app/models/model.onnx
+      # 将最大堆内存限制在 256MB。可以根据测试调整
+      - JAVA_OPTS=-Xmx256m
+#      # Embedding 模型路径配置（生产环境）
+#      - EMBEDDING_TOKENIZER_URL_PROD=file:/app/models/tokenizer.json
+#      - EMBEDDING_ONNX_MODEL_URL_PROD=file:/app/models/model.onnx
     restart: always
     networks:
       - springai
@@ -38,6 +40,9 @@ services:
     ports:
       # 映射端口
       - "9060:9060"
+    environment:
+      # mcp-server 占用较少，尝试限制在 150MB
+      - JAVA_OPTS=-Xmx150m
     restart: always
     networks:
       - springai

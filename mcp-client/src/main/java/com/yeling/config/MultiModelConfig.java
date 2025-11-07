@@ -53,11 +53,6 @@ public class MultiModelConfig {
      @Value("${spring.ai.zhipuai.chat.options.model}")
      private String zhipuModel;
 
-    @Value("${spring.ai.zhipuai.chat.options.eval.model}")
-    private String zhipuEvalModel;
-
-
-
     private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
 
     /**
@@ -132,26 +127,6 @@ public class MultiModelConfig {
                 .defaultToolCallbacks(tools)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .defaultSystem("你是一个聪明的AI助手，名字叫夜凌（ZhiPuAi）")
-                .build();
-    }
-
-    /**
-     * ZhiPu 模型 - 评估模型
-     */
-    @Bean("zhipuEvalClient")
-    public ChatClient zhipuEvalClient() {
-        ZhiPuAiApi api = new ZhiPuAiApi(zhipuKey);
-
-        ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
-                .model(zhipuEvalModel)
-                .temperature(0.0)
-                .build();
-
-        ZhiPuAiChatModel model = new ZhiPuAiChatModel(api, options);
-
-        return ChatClient.builder(model)
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
-                .defaultSystem("你是一个极其专业的ai模型评估专家，你可以完美的评估任何ai模型，名字叫夜凌（ZhiPuAi）")
                 .build();
     }
 
