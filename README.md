@@ -163,13 +163,14 @@ SpringAI-MCP-RAG-Dev 是一个基于 Spring AI 框架开发的现代化智能对
 - ✅ Docker & Docker Compose（可选，用于部署）
 - ✅ Redis 服务器
 - ✅ MySQL 8.0+
+- ✅ Spring AI 前端服务 [前端项目地址](https://github.com/yelingdenghe/spring-ai-mcp-frontend)
 
 ### 本地开发
 
 #### 1️⃣ 克隆项目
 
 ```bash
-git clone https://github.com/your-username/SpringAI-MCP-RAG-Dev.git
+git clone https://github.com/yelingdenghe/spring-ai-mcp-backend.git
 cd SpringAI-MCP-RAG-Dev
 ```
 
