@@ -1,9 +1,22 @@
+### Maven Build ###
 target/
-mcp-server/src/main/resources/.env
-mcp-client/src/main/resources/.env
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+### Sensitive Configuration Files ###
+# Environment variables
+*.env
+.env
+.env.*
+!.env.example
+!*.env.example
+mcp-server/src/main/resources/.env
+mcp-client/src/main/resources/.env
+
+# MCP local configuration (contains personal paths)
+mcp-servers.json
+!mcp-servers.json.example
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -13,6 +26,7 @@ mcp-client/src/main/resources/.env
 *.iws
 *.iml
 *.ipr
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -35,5 +49,33 @@ build/
 ### VS Code ###
 .vscode/
 
+### Logs ###
+logs/
+*.log
+log/
+*.log.*
+
+### Temporary Files ###
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+### Upload & Data ###
+upload/
+uploads/
+data/
+*.db
+*.sqlite
+*.pid
+
 ### Mac OS ###
 .DS_Store
+
+### Windows ###
+Thumbs.db
+desktop.ini
+/mcp-client/src/main/resources/.env_qwen
+/mcp-client/src/main/resources/.env_deepseek
